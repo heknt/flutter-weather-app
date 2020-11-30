@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:weather_app/domain/model/day.dart';
@@ -11,46 +13,52 @@ class Home extends StatefulWidget {
 
 
 class _HomeState extends State<Home> {
-  final Geolocator geolocator =
-    Geolocator()..forceAndroidLocationManager;
+  Geolocator geolocator;
   Position _currentPosition;
   String _currentAddress;
 
   Day _day;
   Hour _hour;
 
-  @override
-  void initState() {
-    super.initState();
-    _getCurrentLocation();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // body: SafeArea(
-      //   child: Padding(
-      //     padding: EdgeInsets.all(10),
-      //     child: Column(
-      appBar: AppBar(
-        title: Text("Weather App"),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            _getLocationWidget(),
-            RaisedButton(
-              child: Text('Daily'),
-              onPressed: _getDaily,
+    return FutureBuilder<void>(
+      future: _getCurrentLocation(),
+      builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+        if (snapshot.hasError) {
+          print('snapshot: $snapshot');
+        }
+        return Scaffold(
+        // body: SafeArea(
+        //   child: Padding(
+        //     padding: EdgeInsets.all(10),
+        //     child: Column(
+          appBar: AppBar(
+            title: Text("Weather App"),
+          ),
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _getLocationWidget(),
+                RaisedButton(
+                  child: Text('Daily'),
+                  onPressed: _getDaily,
+                ),
+                RaisedButton(
+                  child: Text('Hourly'),
+                  onPressed: _getHourly,
+                ),
+              ],
             ),
-            RaisedButton(
-              child: Text('Hourly'),
-              onPressed: _getHourly,
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -79,11 +87,19 @@ class _HomeState extends State<Home> {
                           'Location',
                           style: Theme.of(context).textTheme.caption,
                         ),
+                        Text(
+                          '_currentAddress $_currentAddress',
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                        Text(
+                          '_currentPosition $_currentPosition',
+                          style: Theme.of(context).textTheme.caption,
+                        ),
                         if (_currentPosition != null &&
                             _currentAddress != null)
-                          Text(_currentAddress,
-                              style:
-                                  Theme.of(context).textTheme.bodyText2),
+                          Text(
+                            _currentAddress,
+                            style: Theme.of(context).textTheme.bodyText2),
                       ],
                     ),
                   ),
@@ -108,18 +124,25 @@ class _HomeState extends State<Home> {
   }
 
 
-  void _getCurrentLocation() {
+  Future<void> _getCurrentLocation() async {
+    print('_getCurrentLocation');
+    geolocator =
+      await Geolocator()..forceAndroidLocationManager;
     geolocator
         .getCurrentPosition(
           desiredAccuracy: LocationAccuracy.best)
         .then((Position position) {
       setState(() {
         _currentPosition = position;
+        print('_getCurrentLocation222');
       });
+      print('_getCurrentLocation333');
       _getAddressFromLatLng();
+      print('_getCurrentLocation444');
     }).catchError((e) {
       print(e);
     });
+    print('_getCurrentLocation555');
   }
 
   Future<void> _getAddressFromLatLng() async {
