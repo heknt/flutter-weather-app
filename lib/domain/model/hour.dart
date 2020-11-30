@@ -1,0 +1,40 @@
+import 'package:meta/meta.dart';
+
+
+class Hour {
+  final DateTime time;
+  final String weatherMain;
+  final String weatherDesc;
+  final String weatherIconCode;
+  final num temperature;
+  final num tempFeelsLike;
+  final int pressure;
+  final int humidity;
+  final num atmosphericTemp;
+  final int clouds;
+  final int visibility;
+  final num windSpeed;
+  final int windDegrees;
+  final num windGust;
+  final num snow;
+  final num rain;
+
+  Hour({
+  	@required this.time,
+  	@required this.weatherMain,
+  	@required this.weatherDesc,
+  	@required this.weatherIconCode,
+  	@required this.temperature,
+  	@required this.tempFeelsLike,
+  	@required this.pressure,
+  	@required this.humidity,
+  	@required this.atmosphericTemp,
+  	@required this.clouds,
+  	@required this.visibility,
+  	@required this.windSpeed,
+  	@required this.windDegrees,
+  	this.windGust,
+  	this.snow,
+  	this.rain,
+  });
+}
