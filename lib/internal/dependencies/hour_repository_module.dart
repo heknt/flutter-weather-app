@@ -5,9 +5,9 @@ import 'api_module.dart';
 
 
 class HourRepositoryModule {
-  static HourRepository _dayRepository;
+  static HourRepository _hourRepository;
 
-  static HourRepository dayRepository() {
+  static HourRepository hourRepository() {
     if (_hourRepository == null) {
       _hourRepository = HourDataRepository(
         ApiModule.apiUtil()

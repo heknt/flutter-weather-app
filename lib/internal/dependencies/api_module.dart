@@ -1,5 +1,5 @@
-import 'package:weather_app/data/api_util.dart';
-import 'package:weather_app/data/service/openweathermap_service.dart';
+import 'package:weather_app/data/api/api_util.dart';
+import 'package:weather_app/data/api/services/openweathermap_service.dart';
 
 
 class ApiModule {

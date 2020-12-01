@@ -2,9 +2,9 @@ import 'package:meta/meta.dart';
 
 
 class GetRequestBody {
-  final double latitude;
-  final double longitude;
-  final String language;
+  double latitude;
+  double longitude;
+  String language;
 
   GetRequestBody({
     @required double latitude,

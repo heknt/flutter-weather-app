@@ -27,40 +27,40 @@ class ApiDay {
   final num rain;
 
   ApiDay.fromApi(Map<String, dynamic> map, int index)
-    : time = _getValueByKey(map, index, 'dt'),
-      sunrise = _getValueByKey(map, index, 'sunrise'),
-      sunset = _getValueByKey(map, index, 'sunset'),
-      weatherMain = _getValueByKey(map, index, 'weather')['main'],
-      weatherDesc = _getValueByKey(map, index, 'weather')['description'],
-      weatherIconCode = _getValueByKey(map, index, 'weather')['icon'],
-      dayTemp = _getValueByKey(map, index, 'temp')['day'],
-      minTemp = _getValueByKey(map, index, 'temp')['min'],
-      maxTemp = _getValueByKey(map, index, 'temp')['max'],
-      nightTemp = _getValueByKey(map, index, 'temp')['night'],
-      eveTemp = _getValueByKey(map, index, 'temp')['eve'],
-      mornTemp = _getValueByKey(map, index, 'temp')['morn'],
-      dayTempFeelsLike = _getValueByKey(map, index, 'feels_like')['day'],
-      nightTempFeelsLike = _getValueByKey(map, index, 'feels_like')['night'],
-      eveTempFeelsLike = _getValueByKey(map, index, 'feels_like')['eve'],
-      mornTempFeelsLike = _getValueByKey(map, index, 'feels_like')['morn'],
-      pressure = _getValueByKey(map, index, 'pressure'),
-      humidity = _getValueByKey(map, index, 'humidity'),
-      atmosphericTemp = _getValueByKey(map, index, 'dew_point'),
-      clouds = _getValueByKey(map, index, 'clouds'),
-      visibility = _getValueByKey(map, index, 'visibility'),
-      windSpeed = _getValueByKey(map, index, 'wind_speed'),
-      windDegrees = _getValueByKey(map, index, 'wind_deg'),
+    : time = map['daily'][index]['dt'],
+      sunrise = map['daily'][index]['sunrise'],
+      sunset = map['daily'][index]['sunset'],
+      weatherMain = map['daily'][index]['weather']['main'],
+      weatherDesc = map['daily'][index]['weather']['description'],
+      weatherIconCode = map['daily'][index]['weather']['icon'],
+      dayTemp = map['daily'][index]['temp']['day'],
+      minTemp = map['daily'][index]['temp']['min'],
+      maxTemp = map['daily'][index]['temp']['max'],
+      nightTemp = map['daily'][index]['temp']['night'],
+      eveTemp = map['daily'][index]['temp']['eve'],
+      mornTemp = map['daily'][index]['temp']['morn'],
+      dayTempFeelsLike = map['daily'][index]['feels_like']['day'],
+      nightTempFeelsLike = map['daily'][index]['feels_like']['night'],
+      eveTempFeelsLike = map['daily'][index]['feels_like']['eve'],
+      mornTempFeelsLike = map['daily'][index]['feels_like']['morn'],
+      pressure = map['daily'][index]['pressure'],
+      humidity = map['daily'][index]['humidity'],
+      atmosphericTemp = map['daily'][index]['dew_point'],
+      clouds = map['daily'][index]['clouds'],
+      visibility = map['daily'][index]['visibility'],
+      windSpeed = map['daily'][index]['wind_speed'],
+      windDegrees = map['daily'][index]['wind_deg'],
       windGust = map['daily'][index].containsKey('wind_gust')
-        ? _getValueByKey(map, index, 'wind_gust')
+        ? map['daily'][index]['wind_gust']
         : null,
       snow = map['daily'][index].containsKey('snow')
-        ? _getValueByKey(map, index, 'snow')
+        ? map['daily'][index]['snow']
         : null,
       rain = map['daily'][index].containsKey('rain')
-        ? _getValueByKey(map, index, 'rain')
+        ? map['daily'][index]['rain']
         : null;
 
-  _getValueByKey(Map<String, dynamic> map, int index, String key) {
-    return map['daily'][index][key];
-  }
+  // _getValueByKey(Map<String, dynamic> map, int index, String key) {
+  //   return map['daily'][index][key];
+  // }
 }

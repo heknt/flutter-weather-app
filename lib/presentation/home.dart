@@ -1,10 +1,21 @@
 import 'dart:async';
+import 'dart:ui';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:weather_app/domain/model/day.dart';
 import 'package:weather_app/domain/model/hour.dart';
 
+
+bool isTablet() {
+  Size size = window.physicalSize;
+  double ratio = window.devicePixelRatio;
+  double width = min(size.width / ratio, size.height / ratio);
+  print(width);
+  return width > 600;
+}
 
 class Home extends StatefulWidget {
   @override
@@ -16,14 +27,22 @@ class _HomeState extends State<Home> {
   Geolocator geolocator;
   Position _currentPosition;
   String _currentAddress;
+  num lat = 50;
+  num lng = 30;
 
   Day _day;
   Hour _hour;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  // }
+  @override
+  void initState() {
+    super.initState();
+    if(!isTablet()) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown
+      ]);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +64,10 @@ class _HomeState extends State<Home> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
+                RaisedButton(
+                  child: Text('Get location'),
+                  onPressed: _getLocationWidget,
+                ),
                 _getLocationWidget(),
                 RaisedButton(
                   child: Text('Daily'),
