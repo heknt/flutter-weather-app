@@ -1,4 +1,5 @@
 import 'package:meta/meta.dart';
+import 'package:weather_app/data/api/services/settings/config.dart';
 
 
 class GetRequestBody {
@@ -14,6 +15,7 @@ class GetRequestBody {
 
   Map<String, dynamic> toDayApi() {
     return {
+      'appid': openWeatherMapAppId,
       'units': 'metric',
       'exclude': 'minutelly,hourly',
       'lat': latitude,
@@ -24,6 +26,7 @@ class GetRequestBody {
 
   Map<String, dynamic> toHourApi() {
     return {
+      'appid': openWeatherMapAppId,
       'units': 'metric',
       'exclude': 'minutelly,daily',
       'lat': latitude,

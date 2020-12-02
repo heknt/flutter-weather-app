@@ -18,33 +18,33 @@ class ApiHour {
   final num snow;
   final num rain;
 
-  ApiHour.fromApi(Map<String, dynamic> map, int index)
-    : time = map['hourly'][index]['dt'],
-      sunrise = map['hourly'][index]['sunrise'],
-      sunset = map['hourly'][index]['sunset'],
-      weatherMain = map['hourly'][index]['weather']['main'],
-      weatherDesc = map['hourly'][index]['weather']['description'],
-      weatherIconCode = map['hourly'][index]['weather']['icon'],
-      temperature = map['hourly'][index]['temp'],
-      tempFeelsLike = map['hourly'][index]['feels_like'],
-      pressure = map['hourly'][index]['pressure'],
-      humidity = map['hourly'][index]['humidity'],
-      atmosphericTemp = map['hourly'][index]['dew_point'],
-      clouds = map['hourly'][index]['clouds'],
-      visibility = map['hourly'][index]['visibility'],
-      windSpeed = map['hourly'][index]['wind_speed'],
-      windDegrees = map['hourly'][index]['wind_deg'],
-      windGust = map['hourly'][index].containsKey('wind_gust')
-        ? map['hourly'][index]['wind_gust']
+  ApiHour.fromApi(Map<String, dynamic> map, int _index)
+    : time = map['hourly'][_index]['dt'],
+      sunrise = map['hourly'][_index]['sunrise'],
+      sunset = map['hourly'][_index]['sunset'],
+      weatherMain = map['hourly'][_index]['weather']['main'],
+      weatherDesc = map['hourly'][_index]['weather']['description'],
+      weatherIconCode = map['hourly'][_index]['weather']['icon'],
+      temperature = map['hourly'][_index]['temp'],
+      tempFeelsLike = map['hourly'][_index]['feels_like'],
+      pressure = map['hourly'][_index]['pressure'],
+      humidity = map['hourly'][_index]['humidity'],
+      atmosphericTemp = map['hourly'][_index]['dew_point'],
+      clouds = map['hourly'][_index]['clouds'],
+      visibility = map['hourly'][_index]['visibility'],
+      windSpeed = map['hourly'][_index]['wind_speed'],
+      windDegrees = map['hourly'][_index]['wind_deg'],
+      windGust = map['hourly'][_index].containsKey('wind_gust')
+        ? map['hourly'][_index]['wind_gust']
         : null,
-      snow = map['hourly'][index].containsKey('snow')
-        ? map['hourly'][index]['snow']
+      snow = map['hourly'][_index].containsKey('snow')
+        ? map['hourly'][_index]['snow']
         : null,
-      rain = map['hourly'][index].containsKey('rain')
-        ? map['hourly'][index]['rain']
+      rain = map['hourly'][_index].containsKey('rain')
+        ? map['hourly'][_index]['rain']
         : null;
 
-  // _getValueByKey(Map<String, dynamic> map, int index, String key) {
-  //   return map['hourly'][index][key];
+  // _getValueByKey(Map<String, dynamic> map, int _index, String key) {
+  //   return map['hourly'][_index][key];
   // }
 }

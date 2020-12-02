@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:weather_app/data/api/model/api_day.dart';
 import 'package:weather_app/domain/model/day.dart';
 // import 'package:weather_app/data/storage/constants.dart';
@@ -105,15 +103,4 @@ class DayMapper {
   //     key: (item) => item.toString(),
   //     value: (item) => day.item
   //   );
-
-  static String encode(List<Day> daily) => json.encode(
-        daily
-            .map<Map<String, dynamic>>((day) => toMap(day))
-            .toList(),
-      );
-
-  static List<Day> decode(String daily) =>
-      (json.decode(daily) as List<dynamic>)
-          .map<Day>((item) => fromJson(item))
-          .toList();
 }

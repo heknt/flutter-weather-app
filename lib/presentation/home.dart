@@ -2,11 +2,13 @@ import 'dart:async';
 import 'dart:ui';
 import 'dart:math';
 
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:weather_app/domain/model/day.dart';
 import 'package:weather_app/domain/model/hour.dart';
+import 'package:weather_app/domain/bloc/home_bloc.dart';
 
 
 bool isTablet() {
@@ -27,11 +29,14 @@ class _HomeState extends State<Home> {
   Geolocator geolocator;
   Position _currentPosition;
   String _currentAddress;
-  num lat = 50;
-  num lng = 30;
+  double _latitude = 50.0;
+  double _longitude = 30.0;
 
   Day _day;
   Hour _hour;
+  List<Day> _daily;
+  List<Hour> _hourly;
+  HomeBloc homeBloc;
 
   @override
   void initState() {
@@ -46,6 +51,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    // homeBloc = Provider.of<HomeBloc>(context);
     return FutureBuilder<void>(
       future: _getCurrentLocation(),
       builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
@@ -60,28 +66,72 @@ class _HomeState extends State<Home> {
           appBar: AppBar(
             title: Text("Weather App"),
           ),
-          body: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                RaisedButton(
-                  child: Text('Get location'),
-                  onPressed: _getLocationWidget,
-                ),
-                _getLocationWidget(),
-                RaisedButton(
-                  child: Text('Daily'),
-                  onPressed: _getDaily,
-                ),
-                RaisedButton(
-                  child: Text('Hourly'),
-                  onPressed: _getHourly,
-                ),
-              ],
-            ),
-          ),
+          body: _consumerHomeBloc(),
         );
       },
+    );
+  }
+
+  Widget _consumerHomeBloc() {
+    return Consumer<HomeBloc>(
+      builder: (context, _homeBloc, child) {
+        homeBloc = _homeBloc;
+        return StreamBuilder<List<Day>>(
+          stream: _homeBloc.dailyStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              _daily = snapshot.data;
+            }
+            // else {
+            //   return _whileLoading();
+            // }
+            return StreamBuilder<List<Hour>>(
+              stream: _homeBloc.hourlyStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  _hourly = snapshot.data;
+                }
+                // else {
+                //   return _whileLoading();
+                // }
+                return _columnContent();
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _whileLoading() {
+    return Container(
+      child: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
+
+  Widget _columnContent() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          RaisedButton(
+            child: Text('Get location'),
+            onPressed: _getLocationWidget,
+          ),
+          _getLocationWidget(),
+          RaisedButton(
+            child: Text('Daily'),
+            onPressed: _getDaily,
+          ),
+          RaisedButton(
+            child: Text('Hourly'),
+            onPressed: _getHourly,
+          ),
+
+        ],
+      ),
     );
   }
 
@@ -138,17 +188,27 @@ class _HomeState extends State<Home> {
     );
   }
 
-  _getDaily() {
-    return null;
+  List<Day> _getDaily() {
+    homeBloc.updateDaily.add({
+      'latitude': _latitude,
+      'longitude': _longitude,
+    });
+    print('home.dart: daily: $_daily');
+    return _daily;
   }
 
-  _getHourly() {
-    return null;
+  List<Hour> _getHourly() {
+    homeBloc.updateHourly.add({
+      'latitude': _latitude,
+      'longitude': _longitude,
+    });
+    print('home.dart: hourly: $_hourly');
+    return _hourly;
   }
 
 
   Future<void> _getCurrentLocation() async {
-    print('_getCurrentLocation');
+    print('_getCurrentLocation111 IN');
     geolocator =
       await Geolocator()..forceAndroidLocationManager;
     geolocator
@@ -157,15 +217,15 @@ class _HomeState extends State<Home> {
         .then((Position position) {
       setState(() {
         _currentPosition = position;
-        print('_getCurrentLocation222');
+        print('_getCurrentLocation222 position: $position setState OUT');
       });
-      print('_getCurrentLocation333');
+      print('_getCurrentLocation333 setState After');
       _getAddressFromLatLng();
-      print('_getCurrentLocation444');
+      print('_getCurrentLocation444 geolocator OUT');
     }).catchError((e) {
       print(e);
     });
-    print('_getCurrentLocation555');
+    print('_getCurrentLocation555 OUT');
   }
 
   Future<void> _getAddressFromLatLng() async {
@@ -180,6 +240,16 @@ class _HomeState extends State<Home> {
     } catch (e) {
       print(e);
     }
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
   }
 }
 
