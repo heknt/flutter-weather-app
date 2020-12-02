@@ -17,12 +17,15 @@ class ApiUtil {
     @required double longitude,
     @required String language,
   }) async {
+    print('ApiUtil IN getDay: latitude: $latitude, longitude: $longitude, language: $language');
     final body = GetRequestBody(
       latitude: latitude,
       longitude: longitude,
       language: language
     );
+    print('ApiUtil IN getDay: body: $body');
     final result = await _openWeatherMapService.getDay(body);
+    print('ApiUtil OUT getDay: result: $result, result.pressure ${result.pressure}');
     return DayMapper.fromApi(result);
   }
 

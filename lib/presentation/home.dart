@@ -37,6 +37,7 @@ class _HomeState extends State<Home> {
   List<Day> _daily;
   List<Hour> _hourly;
   HomeBloc homeBloc;
+  bool pressed = false;
 
   @override
   void initState() {
@@ -94,7 +95,9 @@ class _HomeState extends State<Home> {
                 // else {
                 //   return _whileLoading();
                 // }
-                return _columnContent();
+                return homeBloc.isLoading
+                  ? _whileLoading()
+                  : _columnContent();
               },
             );
           },
@@ -129,7 +132,9 @@ class _HomeState extends State<Home> {
             child: Text('Hourly'),
             onPressed: _getHourly,
           ),
-
+          pressed
+            ? _daily ?? Text('_daily is null')
+            : Text('no _daily'),
         ],
       ),
     );
@@ -172,7 +177,8 @@ class _HomeState extends State<Home> {
                             _currentAddress != null)
                           Text(
                             _currentAddress,
-                            style: Theme.of(context).textTheme.bodyText2),
+                            style: Theme.of(context).textTheme.bodyText2
+                          ),
                       ],
                     ),
                   ),
@@ -194,6 +200,7 @@ class _HomeState extends State<Home> {
       'longitude': _longitude,
     });
     print('home.dart: daily: $_daily');
+    setState(() { pressed = true; });
     return _daily;
   }
 
@@ -203,6 +210,7 @@ class _HomeState extends State<Home> {
       'longitude': _longitude,
     });
     print('home.dart: hourly: $_hourly');
+    setState(() { pressed = true; });
     return _hourly;
   }
 

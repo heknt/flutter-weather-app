@@ -5,6 +5,7 @@ import 'package:weather_app/domain/model/day.dart';
 
 class DayMapper {
   static Day fromApi(ApiDay day) {
+    print('DayMapper: day.time: ${day.time}');
     return Day(
       time: DateTime.fromMillisecondsSinceEpoch(
         day.time.toInt()),
@@ -29,7 +30,6 @@ class DayMapper {
       humidity: day.humidity.toInt(),
       atmosphericTemp: day.atmosphericTemp,
       clouds: day.clouds.toInt(),
-      visibility: day.visibility.toInt(),
       windSpeed: day.windSpeed,
       windDegrees: day.windDegrees.toInt(),
       windGust: day.windGust,
@@ -59,7 +59,6 @@ class DayMapper {
       'humidity': day.humidity,
       'atmosphericTemp': day.atmosphericTemp,
       'clouds': day.clouds,
-      'visibility': day.visibility,
       'windSpeed': day.windSpeed,
       'windDegrees': day.windDegrees,
       'windGust': day.windGust,
@@ -89,7 +88,6 @@ class DayMapper {
       humidity: jsonData['humidity'],
       atmosphericTemp: jsonData['atmosphericTemp'],
       clouds: jsonData['clouds'],
-      visibility: jsonData['visibility'],
       windSpeed: jsonData['windSpeed'],
       windDegrees: jsonData['windDegrees'],
       windGust: jsonData['windGust'],

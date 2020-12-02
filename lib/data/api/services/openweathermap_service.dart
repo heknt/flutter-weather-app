@@ -31,9 +31,10 @@ class OpenWeatherMapService {
   Future<ApiDay> getDay(GetRequestBody body) async {
     print('service: BEFORE daily _dio.get; body: $body');
     final response = await _dio.get(
-      'http://api.openweathermap.org/data/2.5/onecall?units=metric&lat=50&lon=30&exclude=minutelly,hourly&appid=3dce7b1b82ac2a9b2ff0f16f28589d65&lang=en',
+      '/data/2.5/onecall?units=metric&lat=50&lon=30&exclude=minutelly,hourly&appid=3dce7b1b82ac2a9b2ff0f16f28589d65&lang=en',
     );
     print('service: AFTER daily _dio.get; response.data: ${response.data}');
+    print('response.data["daily"][0]["dt"]: ${response.data["daily"][0]["dt"]}');
     return ApiDay.fromApi(response.data, 0);
   }
 

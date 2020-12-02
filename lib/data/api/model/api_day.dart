@@ -19,7 +19,6 @@ class ApiDay {
   final num humidity; // %
   final num atmosphericTemp; // dew_point, [Celsius]
   final num clouds; // Cloudiness, %
-  final num visibility; // Average visibility, metres
   final num windSpeed; // [metre/sec]
   final num windDegrees;
   final num windGust;
@@ -30,9 +29,9 @@ class ApiDay {
     : time = map['daily'][_index]['dt'],
       sunrise = map['daily'][_index]['sunrise'],
       sunset = map['daily'][_index]['sunset'],
-      weatherMain = map['daily'][_index]['weather']['main'],
-      weatherDesc = map['daily'][_index]['weather']['description'],
-      weatherIconCode = map['daily'][_index]['weather']['icon'],
+      weatherMain = map['daily'][_index]['weather'][0]['main'],
+      weatherDesc = map['daily'][_index]['weather'][0]['description'],
+      weatherIconCode = map['daily'][_index]['weather'][0]['icon'],
       dayTemp = map['daily'][_index]['temp']['day'],
       minTemp = map['daily'][_index]['temp']['min'],
       maxTemp = map['daily'][_index]['temp']['max'],
@@ -47,7 +46,6 @@ class ApiDay {
       humidity = map['daily'][_index]['humidity'],
       atmosphericTemp = map['daily'][_index]['dew_point'],
       clouds = map['daily'][_index]['clouds'],
-      visibility = map['daily'][_index]['visibility'],
       windSpeed = map['daily'][_index]['wind_speed'],
       windDegrees = map['daily'][_index]['wind_deg'],
       windGust = map['daily'][_index].containsKey('wind_gust')
@@ -58,7 +56,9 @@ class ApiDay {
         : null,
       rain = map['daily'][_index].containsKey('rain')
         ? map['daily'][_index]['rain']
-        : null;
+        : null {
+          print('ApiDay.fromApi: map: $map');
+        }
 
   // _getValueByKey(Map<String, dynamic> map, int _index, String key) {
   //   return map['daily'][_index][key];

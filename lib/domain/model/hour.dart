@@ -12,7 +12,6 @@ class Hour {
   final int humidity;
   final num atmosphericTemp;
   final int clouds;
-  final int visibility;
   final num windSpeed;
   final int windDegrees;
   final num windGust;
@@ -30,7 +29,6 @@ class Hour {
   	@required this.humidity,
   	@required this.atmosphericTemp,
   	@required this.clouds,
-  	@required this.visibility,
   	@required this.windSpeed,
   	@required this.windDegrees,
   	this.windGust,

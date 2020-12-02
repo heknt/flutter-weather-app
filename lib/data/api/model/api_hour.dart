@@ -11,7 +11,6 @@ class ApiHour {
   final num humidity; // %
   final num atmosphericTemp; // dew_point, [Celsius]
   final num clouds; // Cloudiness, %
-  final num visibility; // Average visibility, metres
   final num windSpeed; // [metre/sec]
   final num windDegrees;
   final num windGust;
@@ -22,16 +21,15 @@ class ApiHour {
     : time = map['hourly'][_index]['dt'],
       sunrise = map['hourly'][_index]['sunrise'],
       sunset = map['hourly'][_index]['sunset'],
-      weatherMain = map['hourly'][_index]['weather']['main'],
-      weatherDesc = map['hourly'][_index]['weather']['description'],
-      weatherIconCode = map['hourly'][_index]['weather']['icon'],
+      weatherMain = map['hourly'][_index]['weather'][0]['main'],
+      weatherDesc = map['hourly'][_index]['weather'][0]['description'],
+      weatherIconCode = map['hourly'][_index]['weather'][0]['icon'],
       temperature = map['hourly'][_index]['temp'],
       tempFeelsLike = map['hourly'][_index]['feels_like'],
       pressure = map['hourly'][_index]['pressure'],
       humidity = map['hourly'][_index]['humidity'],
       atmosphericTemp = map['hourly'][_index]['dew_point'],
       clouds = map['hourly'][_index]['clouds'],
-      visibility = map['hourly'][_index]['visibility'],
       windSpeed = map['hourly'][_index]['wind_speed'],
       windDegrees = map['hourly'][_index]['wind_deg'],
       windGust = map['hourly'][_index].containsKey('wind_gust')
