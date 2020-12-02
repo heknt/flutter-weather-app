@@ -7,6 +7,8 @@ import 'package:weather_app/internal/dependencies/home_bloc_module.dart';
 
 
 class Application extends StatelessWidget {
+  static const _title = 'Revolution(Weather)';
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -17,12 +19,12 @@ class Application extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: _title,
         theme: ThemeData(
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: Home(),
+        home: Home(_title),
       ),
     );
   }

@@ -1,6 +1,6 @@
 import 'package:weather_app/data/api/api_util.dart';
-import 'package:weather_app/domain/model/hour.dart';
-import 'package:weather_app/domain/repository/hour_repository.dart';
+import 'package:weather_app/domain/model/hour/hour.dart';
+import 'package:weather_app/domain/repository/hour/hour_repository.dart';
 
 
 class HourDataRepository extends HourRepository {

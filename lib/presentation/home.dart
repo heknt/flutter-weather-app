@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:weather_app/domain/model/day.dart';
-import 'package:weather_app/domain/model/hour.dart';
+import 'package:weather_app/domain/model/day/day.dart';
+import 'package:weather_app/domain/model/hour/hour.dart';
 import 'package:weather_app/domain/bloc/home_bloc.dart';
 import 'package:weather_app/data/storage/constants.dart';
 
@@ -22,12 +22,18 @@ bool isTablet() {
 }
 
 class Home extends StatefulWidget {
+  final String _title;
+
+  Home(this._title);
+
   @override
   _HomeState createState() => _HomeState();    
 }
 
 
 class _HomeState extends State<Home> {
+  final List<String> _availableLangs = ['en', 'ru'];
+  String _language;
   Geolocator geolocator;
   Position _currentPosition;
   String _currentAddress;
@@ -61,16 +67,7 @@ class _HomeState extends State<Home> {
         if (snapshot.hasError) {
           print('snapshot: $snapshot');
         }
-        return Scaffold(
-        // body: SafeArea(
-        //   child: Padding(
-        //     padding: EdgeInsets.all(10),
-        //     child: Column(
-          appBar: AppBar(
-            title: Text("Weather App"),
-          ),
-          body: _consumerHomeBloc(),
-        );
+        return _consumerHomeBloc();
       },
     );
   }
@@ -84,30 +81,106 @@ class _HomeState extends State<Home> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               _daily = snapshot.data;
-            }
+              print('hass Daily');
+            } else { print('hass NOT Daily Dataa'); }
             // else {
             //   return _whileLoading();
             // } 
             pressed
               ? print('snapshot.data ${snapshot.data}')
               : print('not pressed yet.');
-            return pressed
-              ? _showDaily(snapshot.data)
-              : StreamBuilder<List<Hour>>(
+            return StreamBuilder<List<Hour>>(
               stream: homeBloc.hourlyStream,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   _hourly = snapshot.data;
-                }
+                  print('hass Hourly');
+                } else { print('hass NOT Hourly Dataa'); }
                 // else {
                 //   return _whileLoading();
                 // }
-                return _columnContent();
+                return StreamBuilder<String>(
+                  stream: homeBloc.languageStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      _language = snapshot.data;
+                      print('hass Language $_language');
+                    } else { print('hass NOT Language Dataa'); }
+                    
+                    return _scaffold();
+                  },
+                );
               },
             );
           },
         );
       },
+    );
+  }
+
+  Widget _scaffold() {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget._title),
+        actions: <Widget>[
+          _languageChooser(),
+        ],
+      ),
+      body: _columnContent(),
+    );
+  }
+
+  Widget _languageChooser() {
+    return DropdownButton<String>(
+      value: _language,
+      icon: Icon(Icons.arrow_downward),
+      iconSize: 24,
+      elevation: 16,
+      style: TextStyle(color: Colors.deepPurple),
+      underline: Container(
+        height: 2,
+        color: Colors.deepPurpleAccent,
+      ),
+      onChanged: (String chosenLang) {
+        setState(() {
+          _language = chosenLang;
+        });
+        homeBloc.setLanguage.add(_language);
+      },
+      items: _availableLangs
+          .map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _columnContent() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          RaisedButton(
+            child: Text('Get location'),
+            onPressed: _getLocationWidget,
+          ),
+          _getLocationWidget(),
+          RaisedButton(
+            child: Text('Daily'),
+            onPressed: _getDaily,
+          ),
+          RaisedButton(
+            child: Text('Hourly'),
+            onPressed: _getHourly,
+          ),
+          // pressed
+          _daily != null
+            ? _showDaily(_daily) ?? Text('_daily is null')
+            : Text('no _daily'),
+        ],
+      ),
     );
   }
 
@@ -177,32 +250,6 @@ class _HomeState extends State<Home> {
     return Container(
       child: Center(
         child: CircularProgressIndicator(),
-      ),
-    );
-  }
-
-  Widget _columnContent() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          RaisedButton(
-            child: Text('Get location'),
-            onPressed: _getLocationWidget,
-          ),
-          _getLocationWidget(),
-          RaisedButton(
-            child: Text('Daily'),
-            onPressed: _getDaily,
-          ),
-          RaisedButton(
-            child: Text('Hourly'),
-            onPressed: _getHourly,
-          ),
-          pressed
-            ? _daily ?? Text('_daily is null')
-            : Text('no _daily'),
-        ],
       ),
     );
   }

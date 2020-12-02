@@ -1,5 +1,5 @@
-import 'package:weather_app/data/api/model/api_day.dart';
-import 'package:weather_app/domain/model/day.dart';
+import 'package:weather_app/data/api/model/day/api_day.dart';
+import 'package:weather_app/domain/model/day/day.dart';
 // import 'package:weather_app/data/storage/constants.dart';
 
 
@@ -8,11 +8,11 @@ class DayMapper {
     print('DayMapper: day.time: ${day.time}');
     return Day(
       time: DateTime.fromMillisecondsSinceEpoch(
-        day.time.toInt()),
+        day.time.toInt()*1000),
       sunrise: DateTime.fromMillisecondsSinceEpoch(
-        day.sunrise.toInt()),
+        day.sunrise.toInt()*1000),
       sunset: DateTime.fromMillisecondsSinceEpoch(
-        day.sunset.toInt()),
+        day.sunset.toInt()*1000),
       weatherMain: day.weatherMain,
       weatherDesc: day.weatherDesc,
       weatherIconCode: day.weatherIconCode,

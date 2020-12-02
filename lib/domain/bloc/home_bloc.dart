@@ -3,17 +3,17 @@ import 'dart:async';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:meta/meta.dart';
-import 'package:weather_app/domain/repository/day_repository.dart';
-import 'package:weather_app/domain/repository/hour_repository.dart';
-import 'package:weather_app/domain/model/day.dart';
-import 'package:weather_app/domain/model/hour.dart';
-import 'package:weather_app/data/mapper/daily_mapper.dart';
-import 'package:weather_app/data/mapper/hourly_mapper.dart';
+import 'package:weather_app/domain/repository/day/daily_repository.dart';
+import 'package:weather_app/domain/repository/hour/hour_repository.dart';
+import 'package:weather_app/domain/model/day/day.dart';
+import 'package:weather_app/domain/model/hour/hour.dart';
+import 'package:weather_app/data/mapper/day/daily_mapper.dart';
+import 'package:weather_app/data/mapper/hour/hourly_mapper.dart';
 
 
 class HomeBloc {
   final _defaultLanguage;
-  final DayRepository _dayRepository;
+  final DailyRepository _dailyRepository;
   final HourRepository _hourRepository;
   String _language;
   List<Day> _daily;
@@ -24,7 +24,7 @@ class HomeBloc {
   Hour hour;
   bool isLoading = false;
 
-  HomeBloc(this._dayRepository, this._hourRepository)
+  HomeBloc(this._dailyRepository, this._hourRepository)
     : _defaultLanguage = 'en' {
     prefs.then((val) {
       if (val.get('language') != null) {
@@ -121,15 +121,15 @@ class HomeBloc {
     @required String language,
   }) async {
     isLoading = true;
-    final data = await _dayRepository.getDay(
+    final data = await _dailyRepository.getDaily(
       latitude: latitude,
       longitude: longitude,
       language: language
     );
     
     if (data != null) {
-      print('daily data: $data with time ${data.time}');
-      _daily = [data];
+      print('daily data: $data with time ${data[0].time}');
+      // _daily = [data];
       _updateDaily.add(_daily);
       prefs.then((val) {
         // val.setString('daily', DailyMapper.encode([data]));

@@ -13,7 +13,7 @@ class GetRequestBody {
     @required this.language,
   });
 
-  Map<String, dynamic> toDayApi() {
+  Map<String, dynamic> toDailyApi() {
     return {
       'appid': openWeatherMapAppId,
       'units': 'metric',

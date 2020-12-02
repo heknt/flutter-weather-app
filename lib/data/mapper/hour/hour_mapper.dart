@@ -1,5 +1,5 @@
-import 'package:weather_app/data/api/model/api_hour.dart';
-import 'package:weather_app/domain/model/hour.dart';
+import 'package:weather_app/data/api/model/hour/api_hour.dart';
+import 'package:weather_app/domain/model/hour/hour.dart';
 // import 'package:weather_app/data/storage/constants.dart';
 
 
@@ -7,7 +7,7 @@ class HourMapper {
   static Hour fromApi(ApiHour hour) {
     return Hour(
       time: DateTime.fromMillisecondsSinceEpoch(
-        hour.time.toInt()),
+        hour.time.toInt()*1000),
       weatherMain: hour.weatherMain,
       weatherDesc: hour.weatherDesc,
       weatherIconCode: hour.weatherIconCode,

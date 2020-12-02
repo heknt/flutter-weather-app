@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:weather_app/domain/model/hour.dart';
+import 'package:weather_app/domain/model/hour/hour.dart';
 
 
 abstract class HourRepository {

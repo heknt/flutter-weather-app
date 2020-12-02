@@ -1,10 +1,10 @@
 import 'package:meta/meta.dart';
 import 'package:weather_app/data/api/request/get_request_body.dart';
-import 'package:weather_app/data/mapper/day_mapper.dart';
-import 'package:weather_app/data/mapper/hour_mapper.dart';
+import 'package:weather_app/data/mapper/day/daily_mapper.dart';
+import 'package:weather_app/data/mapper/hour/hour_mapper.dart';
 import 'package:weather_app/data/api/services/openweathermap_service.dart';
-import 'package:weather_app/domain/model/day.dart';
-import 'package:weather_app/domain/model/hour.dart';
+import 'package:weather_app/domain/model/day/day.dart';
+import 'package:weather_app/domain/model/hour/hour.dart';
 
 
 class ApiUtil {
@@ -12,7 +12,7 @@ class ApiUtil {
 
   ApiUtil(this._openWeatherMapService);
 
-  Future<Day> getDay({
+  Future<List<Day>> getDaily({
     @required double latitude,
     @required double longitude,
     @required String language,
@@ -23,10 +23,10 @@ class ApiUtil {
       longitude: longitude,
       language: language
     );
-    print('ApiUtil IN getDay: body: $body; body.toDayApi(): ${body.toDayApi()}');
-    final result = await _openWeatherMapService.getDay(body);
-    print('ApiUtil OUT getDay: result: $result, result.pressure ${result.pressure}');
-    return DayMapper.fromApi(result);
+    print('ApiUtil IN getDay: body: $body; body.toDailyApi(): ${body.toDailyApi()}');
+    final dayList = await _openWeatherMapService.getDaily(body);
+    print('ApiUtil OUT getDay: dayList: $dayList, dayList[0].pressure ${dayList[0].pressure}');
+    return DailyMapper.fromApi(dayList);
   }
 
   Future<Hour> getHour({

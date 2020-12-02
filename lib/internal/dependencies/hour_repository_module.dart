@@ -1,5 +1,5 @@
-import 'package:weather_app/data/repository/hour_data_repository.dart';
-import 'package:weather_app/domain/repository/hour_repository.dart';
+import 'package:weather_app/data/repository/hour/hour_data_repository.dart';
+import 'package:weather_app/domain/repository/hour/hour_repository.dart';
 
 import 'api_module.dart';
 
