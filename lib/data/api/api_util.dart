@@ -23,7 +23,7 @@ class ApiUtil {
       longitude: longitude,
       language: language
     );
-    print('ApiUtil IN getDay: body: $body');
+    print('ApiUtil IN getDay: body: $body; body.toDayApi(): ${body.toDayApi()}');
     final result = await _openWeatherMapService.getDay(body);
     print('ApiUtil OUT getDay: result: $result, result.pressure ${result.pressure}');
     return DayMapper.fromApi(result);

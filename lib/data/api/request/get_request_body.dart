@@ -3,14 +3,14 @@ import 'package:weather_app/data/api/services/settings/config.dart';
 
 
 class GetRequestBody {
-  double latitude;
-  double longitude;
-  String language;
+  final double latitude;
+  final double longitude;
+  final String language;
 
   GetRequestBody({
-    @required double latitude,
-    @required double longitude,
-    @required String language,
+    @required this.latitude,
+    @required this.longitude,
+    @required this.language,
   });
 
   Map<String, dynamic> toDayApi() {

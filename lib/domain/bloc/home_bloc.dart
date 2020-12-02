@@ -52,9 +52,10 @@ class HomeBloc {
 
       if (val.get('daily') != null) {
         final _dailyStr = val.getString('daily');
+        val.setString('daily', null);
         if (_dailyStr != null) {
-          _daily = DailyMapper.decode(_dailyStr);
-          _updateDaily.add(_daily);
+          // _daily = DailyMapper.decode(_dailyStr);
+          // _updateDaily.add(_daily);
         }
       }
       _dailyActionController
@@ -127,10 +128,11 @@ class HomeBloc {
     );
     
     if (data != null) {
-      print('daily data: $data');
+      print('daily data: $data with time ${data.time}');
       _daily = [data];
+      _updateDaily.add(_daily);
       prefs.then((val) {
-        val.setString('daily', DailyMapper.encode([data]));
+        // val.setString('daily', DailyMapper.encode([data]));
       });
     }
     isLoading = false;

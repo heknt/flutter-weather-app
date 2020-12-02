@@ -5,11 +5,11 @@ import 'day_mapper.dart';
 
 
 class DailyMapper {
-  static String encode(List<Day> daily) =>
+  static String encode(List<Day> daily) => jsonEncode(
         daily
             .map<Map<String, dynamic>>((day) => DayMapper.toMap(day))
-            .toList()
-            .toString();
+            .toList(),
+      );
 
   static List<Day> decode(String daily) =>
       (jsonDecode(daily) as List<dynamic>)

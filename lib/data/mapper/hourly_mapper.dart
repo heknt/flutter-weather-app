@@ -5,11 +5,11 @@ import 'hour_mapper.dart';
 
 
 class HourlyMapper {
-  static String encode(List<Hour> hourly) =>
+  static String encode(List<Hour> hourly) => jsonEncode(
         hourly
             .map<Map<String, dynamic>>((hour) => HourMapper.toMap(hour))
-            .toList()
-            .toString();
+            .toList(),
+      );
 
   static List<Hour> decode(String hourly) =>
       (jsonDecode(hourly) as List<dynamic>)

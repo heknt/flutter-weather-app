@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'dart:math';
 
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +10,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:weather_app/domain/model/day.dart';
 import 'package:weather_app/domain/model/hour.dart';
 import 'package:weather_app/domain/bloc/home_bloc.dart';
+import 'package:weather_app/data/storage/constants.dart';
 
 
 bool isTablet() {
@@ -78,16 +80,21 @@ class _HomeState extends State<Home> {
       builder: (context, _homeBloc, child) {
         homeBloc = _homeBloc;
         return StreamBuilder<List<Day>>(
-          stream: _homeBloc.dailyStream,
+          stream: homeBloc.dailyStream,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               _daily = snapshot.data;
             }
             // else {
             //   return _whileLoading();
-            // }
-            return StreamBuilder<List<Hour>>(
-              stream: _homeBloc.hourlyStream,
+            // } 
+            pressed
+              ? print('snapshot.data ${snapshot.data}')
+              : print('not pressed yet.');
+            return pressed
+              ? _showDaily(snapshot.data)
+              : StreamBuilder<List<Hour>>(
+              stream: homeBloc.hourlyStream,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   _hourly = snapshot.data;
@@ -95,14 +102,74 @@ class _HomeState extends State<Home> {
                 // else {
                 //   return _whileLoading();
                 // }
-                return homeBloc.isLoading
-                  ? _whileLoading()
-                  : _columnContent();
+                return _columnContent();
               },
             );
           },
         );
       },
+    );
+  }
+
+  Widget _showDaily(List<Day> dayList) {
+    return dayList != null
+      ? Column(
+          children: _getDayWidgetList(dayList),
+        )
+      : Text('_showDaily error: dayList is null');
+  }
+
+// TimeOfDay for hours
+  List<Widget> _getDayWidgetList(List<Day> dayList) {
+    List<Widget> _dayWidgetList = [];
+    for (final day in dayList) {
+      _dayWidgetList.add(
+        Text('Weather for ${DateFormat.yMMMMEEEEd().format(day.time)}')
+      );
+      _dayWidgetList.add(_getDayWidget(day));
+    }
+    return _dayWidgetList;
+  }
+
+  Widget _getDayWidget(Day day) {
+    final doNotExistLable = 'not today';
+    return Container(
+      child: Column(
+        children: <Widget>[
+          _getFieldDataRow(dayFieldsTitle['time'], day.time),
+          _getFieldDataRow(dayFieldsTitle['sunrise'], day.sunrise),
+          _getFieldDataRow(dayFieldsTitle['sunset'], day.sunset),
+          _getFieldDataRow(dayFieldsTitle['weather_main'], day.weatherMain),
+          _getFieldDataRow(dayFieldsTitle['weather_desc'], day.weatherDesc),
+          _getFieldDataRow(dayFieldsTitle['weather_icon_code'], day.weatherIconCode),
+          _getFieldDataRow(dayFieldsTitle['day_temp'], day.dayTemp),
+          _getFieldDataRow(dayFieldsTitle['min_temp'], day.minTemp),
+          _getFieldDataRow(dayFieldsTitle['max_temp'], day.maxTemp),
+          _getFieldDataRow(dayFieldsTitle['night_temp'], day.nightTemp),
+          _getFieldDataRow(dayFieldsTitle['day_temp_feels_like'], day.dayTempFeelsLike),
+          _getFieldDataRow(dayFieldsTitle['night_temp_feels_like'], day.nightTempFeelsLike),
+          _getFieldDataRow(dayFieldsTitle['eve_temp_feels_like'], day.eveTempFeelsLike),
+          _getFieldDataRow(dayFieldsTitle['morn_temp_feels_like'], day.mornTempFeelsLike),
+          _getFieldDataRow(dayFieldsTitle['pressure'], day.pressure),
+          _getFieldDataRow(dayFieldsTitle['humidity'], day.humidity),
+          _getFieldDataRow(dayFieldsTitle['atmospheric_temp'], day.atmosphericTemp),
+          _getFieldDataRow(dayFieldsTitle['clouds'], day.clouds),
+          _getFieldDataRow(dayFieldsTitle['wind_speed'], day.windSpeed),
+          _getFieldDataRow(dayFieldsTitle['wind_degrees'], day.windDegrees),
+          _getFieldDataRow(dayFieldsTitle['wind_gust'], day.windGust ?? doNotExistLable),
+          _getFieldDataRow(dayFieldsTitle['snow'], day.snow ?? doNotExistLable),
+          _getFieldDataRow(dayFieldsTitle['rain'], day.rain ?? doNotExistLable),
+        ],
+      ),
+    );
+  }
+
+  Widget _getFieldDataRow(String attrTitle, var attrValue) {
+    return Row(
+      children: <Widget>[
+        Text('$attrTitle: '),
+        Text('$attrValue'),
+      ],
     );
   }
 
