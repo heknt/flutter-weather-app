@@ -1,7 +1,7 @@
 import 'package:meta/meta.dart';
 import 'package:weather_app/data/api/request/get_request_body.dart';
 import 'package:weather_app/data/mapper/day/daily_mapper.dart';
-import 'package:weather_app/data/mapper/hour/hour_mapper.dart';
+import 'package:weather_app/data/mapper/hour/hourly_mapper.dart';
 import 'package:weather_app/data/api/services/openweathermap_service.dart';
 import 'package:weather_app/domain/model/day/day.dart';
 import 'package:weather_app/domain/model/hour/hour.dart';
@@ -29,7 +29,7 @@ class ApiUtil {
     return DailyMapper.fromApi(dayList);
   }
 
-  Future<Hour> getHour({
+  Future<List<Hour>> getHourly({
     @required double latitude,
     @required double longitude,
     @required String language,
@@ -39,7 +39,7 @@ class ApiUtil {
       longitude: longitude,
       language: language
     );
-    final result = await _openWeatherMapService.getHour(body);
-    return HourMapper.fromApi(result);
+    final result = await _openWeatherMapService.getHourly(body);
+    return HourlyMapper.fromApi(result);
   }
 }

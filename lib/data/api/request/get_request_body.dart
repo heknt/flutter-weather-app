@@ -24,7 +24,7 @@ class GetRequestBody {
     };
   }
 
-  Map<String, dynamic> toHourApi() {
+  Map<String, dynamic> toHourlyApi() {
     return {
       'appid': openWeatherMapAppId,
       'units': 'metric',

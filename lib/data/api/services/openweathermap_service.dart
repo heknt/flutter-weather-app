@@ -18,7 +18,7 @@ class OpenWeatherMapService {
   //   '$_apiBaseUrl/data/2.5/onecall?appid=$openWeatherMapAppId';
   
   String _getIconUrl(String iconCode) => 
-    '$_apiBaseUrl/img/wn/$iconCode@2x.png';
+    'http://openweathermap.org/img/wn/$iconCode@2x.png';
  
   final Dio _dio = Dio(
     BaseOptions(
@@ -38,13 +38,13 @@ class OpenWeatherMapService {
     return ApiDaily.fromApi(response.data);
   }
 
-  Future<ApiHour> getHour(GetRequestBody body) async {
+  Future<List<ApiHour>> getHourly(GetRequestBody body) async {
     print('service: BEFORE hourly _dio.get; body: $body');
     final response = await _dio.get(
       '/data/2.5/onecall',
-      queryParameters: body.toHourApi(),
+      queryParameters: body.toHourlyApi(),
     );
     print('service: AFTER hourly _dio.get; response: $response');
-    return ApiHour.fromApi(response.data, 0);
+    return ApiHourly.fromApi(response.data);
   }
 }

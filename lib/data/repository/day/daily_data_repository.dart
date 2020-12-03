@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:weather_app/data/api/api_util.dart';
 import 'package:weather_app/domain/model/day/day.dart';
 import 'package:weather_app/domain/repository/day/daily_repository.dart';

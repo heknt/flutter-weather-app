@@ -33,8 +33,12 @@ class DayMapper {
       windSpeed: day.windSpeed,
       windDegrees: day.windDegrees.toInt(),
       windGust: day.windGust,
-      snow: day.snow,
-      rain: day.rain,
+      snow: day.snow != null
+        ? day.snow*100
+        : null,
+      rain: day.rain != null
+        ? day.rain*100
+        : null,
     );
   }
 

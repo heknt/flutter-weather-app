@@ -20,8 +20,12 @@ class HourMapper {
       windSpeed: hour.windSpeed,
       windDegrees: hour.windDegrees.toInt(),
       windGust: hour.windGust,
-      snow: hour.snow,
-      rain: hour.rain,
+      snow: hour.snow != null
+        ? hour.snow*100
+        : null,
+      rain: hour.rain != null
+        ? hour.rain*100
+        : null,
     );
   }
 

@@ -4,7 +4,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:meta/meta.dart';
 import 'package:weather_app/domain/repository/day/daily_repository.dart';
-import 'package:weather_app/domain/repository/hour/hour_repository.dart';
+import 'package:weather_app/domain/repository/hour/hourly_repository.dart';
 import 'package:weather_app/domain/model/day/day.dart';
 import 'package:weather_app/domain/model/hour/hour.dart';
 import 'package:weather_app/data/mapper/day/daily_mapper.dart';
@@ -14,7 +14,7 @@ import 'package:weather_app/data/mapper/hour/hourly_mapper.dart';
 class HomeBloc {
   final _defaultLanguage;
   final DailyRepository _dailyRepository;
-  final HourRepository _hourRepository;
+  final HourlyRepository _hourlyRepository;
   String _language;
   List<Day> _daily;
   List<Hour> _hourly;
@@ -24,7 +24,7 @@ class HomeBloc {
   Hour hour;
   bool isLoading = false;
 
-  HomeBloc(this._dailyRepository, this._hourRepository)
+  HomeBloc(this._dailyRepository, this._hourlyRepository)
     : _defaultLanguage = 'en' {
     prefs.then((val) {
       if (val.get('language') != null) {
@@ -52,10 +52,9 @@ class HomeBloc {
 
       if (val.get('daily') != null) {
         final _dailyStr = val.getString('daily');
-        val.setString('daily', null);
         if (_dailyStr != null) {
-          // _daily = DailyMapper.decode(_dailyStr);
-          // _updateDaily.add(_daily);
+          _daily = DailyMapper.decode(_dailyStr);
+          _updateDaily.add(_daily);
         }
       }
       _dailyActionController
@@ -130,9 +129,9 @@ class HomeBloc {
     if (data != null) {
       print('daily data: $data with time ${data[0].time}');
       // _daily = [data];
-      _updateDaily.add(_daily);
+      _updateDaily.add(data);
       prefs.then((val) {
-        // val.setString('daily', DailyMapper.encode([data]));
+        // val.setString('daily', DailyMapper.encode(data));
       });
     }
     isLoading = false;
@@ -152,7 +151,7 @@ class HomeBloc {
     @required String language,
   }) async {
     isLoading = true;
-    final data = await _hourRepository.getHour(
+    final data = await _hourlyRepository.getHourly(
       latitude: latitude,
       longitude: longitude,
       language: language
@@ -160,9 +159,10 @@ class HomeBloc {
 
     if (data != null) {
       print('hourly data: $data');
-      _hourly = [data];
+      // _hourly = [data];
+      _updateHourly.add(data);
       prefs.then((val) {
-        val.setString('hourly', HourlyMapper.encode([data]));
+        // val.setString('hourly', HourlyMapper.encode(data));
       });
     }
     isLoading = false;

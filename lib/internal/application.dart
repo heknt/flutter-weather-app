@@ -7,7 +7,7 @@ import 'package:weather_app/internal/dependencies/home_bloc_module.dart';
 
 
 class Application extends StatelessWidget {
-  static const _title = 'Revolution(Weather)';
+  static const _title = 'Revolution<ohh,Weather,I mean>';
 
   @override
   Widget build(BuildContext context) {

@@ -11,6 +11,7 @@ import 'package:weather_app/domain/model/day/day.dart';
 import 'package:weather_app/domain/model/hour/hour.dart';
 import 'package:weather_app/domain/bloc/home_bloc.dart';
 import 'package:weather_app/data/storage/constants.dart';
+// import 'package:weather_app/data/api/services/openweathermap_service.dart';
 
 
 bool isTablet() {
@@ -27,15 +28,17 @@ class Home extends StatefulWidget {
   Home(this._title);
 
   @override
-  _HomeState createState() => _HomeState();    
+  HomeState createState() => HomeState();    
 }
 
 
-class _HomeState extends State<Home> {
+class HomeState extends State<Home> {
   final List<String> _availableLangs = ['en', 'ru'];
   String _language;
+  String _timeFormatOfLang;
   Geolocator geolocator;
   Position _currentPosition;
+  Widget _locationWidget;
   String _currentAddress;
   double _latitude = 50.0;
   double _longitude = 30.0;
@@ -50,12 +53,18 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    if(!isTablet()) {
+    if (!isTablet()) {
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
         DeviceOrientation.portraitDown
       ]);
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _locationWidget = _getLocationWidget();
   }
 
   @override
@@ -65,14 +74,14 @@ class _HomeState extends State<Home> {
       future: _getCurrentLocation(),
       builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
         if (snapshot.hasError) {
-          print('snapshot: $snapshot');
+          print('snapshot has error: $snapshot');
         }
-        return _consumerHomeBloc();
+        return _consumeHomeBloc();
       },
     );
   }
 
-  Widget _consumerHomeBloc() {
+  Widget _consumeHomeBloc() {
     return Consumer<HomeBloc>(
       builder: (context, _homeBloc, child) {
         homeBloc = _homeBloc;
@@ -104,6 +113,9 @@ class _HomeState extends State<Home> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       _language = snapshot.data;
+                      _timeFormatOfLang = _language == 'en'
+                        ? 'h:mm a'
+                        : 'k:mm';
                       print('hass Language $_language');
                     } else { print('hass NOT Language Dataa'); }
                     
@@ -126,7 +138,7 @@ class _HomeState extends State<Home> {
           _languageChooser(),
         ],
       ),
-      body: _columnContent(),
+      body: _contentColumn(),
     );
   }
 
@@ -136,10 +148,10 @@ class _HomeState extends State<Home> {
       icon: Icon(Icons.arrow_downward),
       iconSize: 24,
       elevation: 16,
-      style: TextStyle(color: Colors.deepPurple),
+      // style: TextStyle(color: Colors.white),
       underline: Container(
         height: 2,
-        color: Colors.deepPurpleAccent,
+        // color: Colors.white,
       ),
       onChanged: (String chosenLang) {
         setState(() {
@@ -157,28 +169,40 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _columnContent() {
+  Widget _contentColumn() {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           RaisedButton(
             child: Text('Get location'),
-            onPressed: _getLocationWidget,
+            onPressed: () {
+              setState(() {
+                _locationWidget = _getLocationWidget();
+              });
+            }
           ),
-          _getLocationWidget(),
-          RaisedButton(
-            child: Text('Daily'),
-            onPressed: _getDaily,
+          _locationWidget,
+          Row(
+            children: <Widget>[
+              RaisedButton(
+                child: Text('Daily'),
+                onPressed: _getDaily,
+              ),
+              RaisedButton(
+                child: Text('Hourly'),
+                onPressed: _getHourly,
+              ),
+            ],
           ),
-          RaisedButton(
-            child: Text('Hourly'),
-            onPressed: _getHourly,
-          ),
-          // pressed
-          _daily != null
-            ? _showDaily(_daily) ?? Text('_daily is null')
-            : Text('no _daily'),
+          // if (pressed) {
+            _daily != null
+              ? _showDaily(_daily) ?? Text('_daily is null')
+              : Text('no _daily'),
+            _hourly != null
+              ? _showHourly(_hourly) ?? Text('_hourly is null')
+              : Text('no _hourly'),
+          // }
         ],
       ),
     );
@@ -192,56 +216,129 @@ class _HomeState extends State<Home> {
       : Text('_showDaily error: dayList is null');
   }
 
-// TimeOfDay for hours
+  Widget _showHourly(List<Hour> hourList) {
+    return hourList != null
+      ? Column(
+          children: _getHourWidgetList(hourList),
+        )
+      : Text('_showHourly error: hourList is null');
+  }
+
+
   List<Widget> _getDayWidgetList(List<Day> dayList) {
     List<Widget> _dayWidgetList = [];
+    
+
     for (final day in dayList) {
       _dayWidgetList.add(
-        Text('Weather for ${DateFormat.yMMMMEEEEd().format(day.time)}')
+        _getIconFromNetwork(day.weatherIconCode)
+      );
+      _dayWidgetList.add(
+        Text('${dayFieldsInfo["time"][_language]}  ${DateFormat.yMMMMEEEEd().format(day.time)}')
       );
       _dayWidgetList.add(_getDayWidget(day));
     }
     return _dayWidgetList;
   }
 
+  // TimeOfDay for hours
+  List<Widget> _getHourWidgetList(List<Hour> hourList) {
+    List<Widget> _hourWidgetList = [];
+    // final OpenWeatherMapService _service = OpenWeatherMapService();
+
+    for (final hour in hourList) {
+      _hourWidgetList.add(
+        _getIconFromNetwork(
+          // _service,
+          hour.weatherIconCode)
+      );
+      _hourWidgetList.add(
+        Text('${hourFieldsInfo["time"][_language]} ${DateFormat("$_timeFormatOfLang, EEEE, MMMM d").format(hour.time)}')
+      );
+      _hourWidgetList.add(_getHourWidget(hour));
+    }
+    return _hourWidgetList;
+  }
+
+  Widget _getIconFromNetwork(
+    // OpenWeatherMapService _service,
+    String iconCode
+  ){
+    return Image.network(
+      /// _service doesn't want to define methods
+      /// i.e. '_getIconUrl()', '_apiBaseUrl'...
+      // _service._getIconUrl(iconCode)
+
+      /// so local full-defined url for this
+      'http://openweathermap.org/img/wn/$iconCode@2x.png'
+    );
+  }
+
   Widget _getDayWidget(Day day) {
-    final doNotExistLable = 'not today';
+    final doNotExistLable = 'not this day';
     return Container(
       child: Column(
         children: <Widget>[
-          _getFieldDataRow(dayFieldsTitle['time'], day.time),
-          _getFieldDataRow(dayFieldsTitle['sunrise'], day.sunrise),
-          _getFieldDataRow(dayFieldsTitle['sunset'], day.sunset),
-          _getFieldDataRow(dayFieldsTitle['weather_main'], day.weatherMain),
-          _getFieldDataRow(dayFieldsTitle['weather_desc'], day.weatherDesc),
-          _getFieldDataRow(dayFieldsTitle['weather_icon_code'], day.weatherIconCode),
-          _getFieldDataRow(dayFieldsTitle['day_temp'], day.dayTemp),
-          _getFieldDataRow(dayFieldsTitle['min_temp'], day.minTemp),
-          _getFieldDataRow(dayFieldsTitle['max_temp'], day.maxTemp),
-          _getFieldDataRow(dayFieldsTitle['night_temp'], day.nightTemp),
-          _getFieldDataRow(dayFieldsTitle['day_temp_feels_like'], day.dayTempFeelsLike),
-          _getFieldDataRow(dayFieldsTitle['night_temp_feels_like'], day.nightTempFeelsLike),
-          _getFieldDataRow(dayFieldsTitle['eve_temp_feels_like'], day.eveTempFeelsLike),
-          _getFieldDataRow(dayFieldsTitle['morn_temp_feels_like'], day.mornTempFeelsLike),
-          _getFieldDataRow(dayFieldsTitle['pressure'], day.pressure),
-          _getFieldDataRow(dayFieldsTitle['humidity'], day.humidity),
-          _getFieldDataRow(dayFieldsTitle['atmospheric_temp'], day.atmosphericTemp),
-          _getFieldDataRow(dayFieldsTitle['clouds'], day.clouds),
-          _getFieldDataRow(dayFieldsTitle['wind_speed'], day.windSpeed),
-          _getFieldDataRow(dayFieldsTitle['wind_degrees'], day.windDegrees),
-          _getFieldDataRow(dayFieldsTitle['wind_gust'], day.windGust ?? doNotExistLable),
-          _getFieldDataRow(dayFieldsTitle['snow'], day.snow ?? doNotExistLable),
-          _getFieldDataRow(dayFieldsTitle['rain'], day.rain ?? doNotExistLable),
+          _getFieldDataRow(dayFieldsInfo['sunrise'], _toTimeOfDayStr(day.sunrise)),
+          _getFieldDataRow(dayFieldsInfo['sunset'], _toTimeOfDayStr(day.sunset)),
+          _getFieldDataRow(dayFieldsInfo['weather_main'], day.weatherMain),
+          _getFieldDataRow(dayFieldsInfo['weather_desc'], day.weatherDesc),
+          _getFieldDataRow(dayFieldsInfo['day_temp'], day.dayTemp),
+          _getFieldDataRow(dayFieldsInfo['min_temp'], day.minTemp),
+          _getFieldDataRow(dayFieldsInfo['max_temp'], day.maxTemp),
+          _getFieldDataRow(dayFieldsInfo['night_temp'], day.nightTemp),
+          _getFieldDataRow(dayFieldsInfo['eve_temp'], day.eveTemp),
+          _getFieldDataRow(dayFieldsInfo['morn_temp'], day.mornTemp),
+          _getFieldDataRow(dayFieldsInfo['day_temp_feels_like'], day.dayTempFeelsLike),
+          _getFieldDataRow(dayFieldsInfo['night_temp_feels_like'], day.nightTempFeelsLike),
+          _getFieldDataRow(dayFieldsInfo['eve_temp_feels_like'], day.eveTempFeelsLike),
+          _getFieldDataRow(dayFieldsInfo['morn_temp_feels_like'], day.mornTempFeelsLike),
+          _getFieldDataRow(dayFieldsInfo['pressure'], day.pressure),
+          _getFieldDataRow(dayFieldsInfo['humidity'], day.humidity),
+          _getFieldDataRow(dayFieldsInfo['atmospheric_temp'], day.atmosphericTemp),
+          _getFieldDataRow(dayFieldsInfo['clouds'], day.clouds),
+          _getFieldDataRow(dayFieldsInfo['wind_speed'], day.windSpeed),
+          _getFieldDataRow(dayFieldsInfo['wind_degrees'], day.windDegrees),
+          _getFieldDataRow(dayFieldsInfo['wind_gust'], day.windGust ?? doNotExistLable),
+          _getFieldDataRow(dayFieldsInfo['snow'], day.snow ?? doNotExistLable),
+          _getFieldDataRow(dayFieldsInfo['rain'], day.rain ?? doNotExistLable),
         ],
       ),
     );
   }
 
-  Widget _getFieldDataRow(String attrTitle, var attrValue) {
+  String _toTimeOfDayStr(DateTime rawTime) {
+    return DateFormat(_timeFormatOfLang).format(rawTime);
+  }
+
+  Widget _getHourWidget(Hour hour) {
+    final doNotExistLable = 'not this hour';
+    return Container(
+      child: Column(
+        children: <Widget>[
+          _getFieldDataRow(hourFieldsInfo['weather_main'], hour.weatherMain),
+          _getFieldDataRow(hourFieldsInfo['weather_desc'], hour.weatherDesc),
+          _getFieldDataRow(hourFieldsInfo['temperature'], hour.temperature),
+          _getFieldDataRow(hourFieldsInfo['temp_feels_like'], hour.tempFeelsLike),
+          _getFieldDataRow(hourFieldsInfo['pressure'], hour.pressure),
+          _getFieldDataRow(hourFieldsInfo['humidity'], hour.humidity),
+          _getFieldDataRow(hourFieldsInfo['atmospheric_temp'], hour.atmosphericTemp),
+          _getFieldDataRow(hourFieldsInfo['clouds'], hour.clouds),
+          _getFieldDataRow(hourFieldsInfo['wind_speed'], hour.windSpeed),
+          _getFieldDataRow(hourFieldsInfo['wind_degrees'], hour.windDegrees),
+          _getFieldDataRow(hourFieldsInfo['wind_gust'], hour.windGust ?? doNotExistLable),
+          _getFieldDataRow(hourFieldsInfo['snow'], hour.snow ?? doNotExistLable),
+          _getFieldDataRow(hourFieldsInfo['rain'], hour.rain ?? doNotExistLable),
+        ],
+      ),
+    );
+  }
+
+  Widget _getFieldDataRow(Map<String, dynamic> fieldMap, var fieldValue) {
     return Row(
       children: <Widget>[
-        Text('$attrTitle: '),
-        Text('$attrValue'),
+        Text('${fieldMap[_language]}: '),
+        Text('$fieldValue ${fieldMap["unit"][_language]}'),
       ],
     );
   }
@@ -314,7 +411,6 @@ class _HomeState extends State<Home> {
       'longitude': _longitude,
     });
     print('home.dart: daily: $_daily');
-    setState(() { pressed = true; });
     return _daily;
   }
 
@@ -324,7 +420,6 @@ class _HomeState extends State<Home> {
       'longitude': _longitude,
     });
     print('home.dart: hourly: $_hourly');
-    setState(() { pressed = true; });
     return _hourly;
   }
 
