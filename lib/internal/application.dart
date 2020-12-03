@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:weather_app/presentation/home.dart';
+import 'package:weather_app/presentation/splash_screen.dart';
+import 'package:weather_app/presentation/home_screen.dart';
 import 'package:weather_app/domain/bloc/home_bloc.dart';
 import 'package:weather_app/internal/dependencies/home_bloc_module.dart';
+
+import 'routes.dart';
 
 
 class Application extends StatelessWidget {
@@ -24,7 +27,12 @@ class Application extends StatelessWidget {
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: Home(_title),
+        home: HomeScreen(_title),
+        initialRoute: splashScreenRouteName,
+        routes: {
+          splashScreenRouteName: (context) => SplashScreen(),
+          homeScreenRouteName: (context) => HomeScreen(_title),
+        },
       ),
     );
   }

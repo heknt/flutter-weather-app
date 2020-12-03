@@ -22,26 +22,27 @@ bool isTablet() {
   return width > 600;
 }
 
-class Home extends StatefulWidget {
+class HomeScreen extends StatefulWidget {
   final String _title;
 
-  Home(this._title);
+  HomeScreen(this._title);
 
   @override
-  HomeState createState() => HomeState();    
+  HomeScreenState createState() => HomeScreenState();    
 }
 
 
-class HomeState extends State<Home> {
+class HomeScreenState extends State<HomeScreen> {
   final List<String> _availableLangs = ['en', 'ru'];
   String _language;
-  String _timeFormatOfLang;
+  String _dayTimeFormatOfLang;
+  String _dateFormatOfLang;
   Geolocator geolocator;
   Position _currentPosition;
-  Widget _locationWidget;
   String _currentAddress;
-  double _latitude = 50.0;
-  double _longitude = 30.0;
+  Widget _locationWidget;
+  double _latitude;
+  double _longitude;
 
   Day _day;
   Hour _hour;
@@ -59,6 +60,9 @@ class HomeState extends State<Home> {
         DeviceOrientation.portraitDown
       ]);
     }
+    _language = 'en';
+    _latitude = 50.0;
+    _longitude = 30.0;
   }
 
   @override
@@ -70,18 +74,6 @@ class HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     // homeBloc = Provider.of<HomeBloc>(context);
-    return FutureBuilder<void>(
-      future: _getCurrentLocation(),
-      builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-        if (snapshot.hasError) {
-          print('snapshot has error: $snapshot');
-        }
-        return _consumeHomeBloc();
-      },
-    );
-  }
-
-  Widget _consumeHomeBloc() {
     return Consumer<HomeBloc>(
       builder: (context, _homeBloc, child) {
         homeBloc = _homeBloc;
@@ -113,19 +105,46 @@ class HomeState extends State<Home> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       _language = snapshot.data;
-                      _timeFormatOfLang = _language == 'en'
+                      _dateFormatOfLang = _language == 'en'
+                        ? 'EEEE, MMMM d'
+                        : 'dd-MM-yyyy';
+                      _dayTimeFormatOfLang = _language == 'en'
                         ? 'h:mm a'
                         : 'k:mm';
                       print('hass Language $_language');
                     } else { print('hass NOT Language Dataa'); }
                     
-                    return _scaffold();
+                    return StreamBuilder<List<double>>(
+                      stream: homeBloc.positionStream,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          _latitude = snapshot.data[0];
+                          _longitude = snapshot.data[1];
+                          _locationWidget = _getLocationWidget();
+                          print('hass Position ${snapshot.data}');
+                        } else { print('hass NOT Hourly Dataa'); }
+
+                        return _futureBuilderLocation();
+                      },
+                    );
                   },
                 );
               },
             );
           },
         );
+      },
+    );
+  }
+
+  Widget _futureBuilderLocation() {
+    return FutureBuilder<void>(
+      future: _getCurrentLocation(),
+      builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+        if (snapshot.hasError) {
+          print('snapshot has error: $snapshot');
+        }
+        return _scaffold();
       },
     );
   }
@@ -174,14 +193,6 @@ class HomeState extends State<Home> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          RaisedButton(
-            child: Text('Get location'),
-            onPressed: () {
-              setState(() {
-                _locationWidget = _getLocationWidget();
-              });
-            }
-          ),
           _locationWidget,
           Row(
             children: <Widget>[
@@ -233,8 +244,9 @@ class HomeState extends State<Home> {
       _dayWidgetList.add(
         _getIconFromNetwork(day.weatherIconCode)
       );
+      String timeFormat = DateFormat(_dateFormatOfLang).format(day.time);
       _dayWidgetList.add(
-        Text('${dayFieldsInfo["time"][_language]}  ${DateFormat.yMMMMEEEEd().format(day.time)}')
+        Text('${dayFieldsInfo["time"][_language]} $timeFormat')
       );
       _dayWidgetList.add(_getDayWidget(day));
     }
@@ -252,8 +264,10 @@ class HomeState extends State<Home> {
           // _service,
           hour.weatherIconCode)
       );
+      String timeFormat =
+          DateFormat("$_dayTimeFormatOfLang, $_dateFormatOfLang").format(hour.time);
       _hourWidgetList.add(
-        Text('${hourFieldsInfo["time"][_language]} ${DateFormat("$_timeFormatOfLang, EEEE, MMMM d").format(hour.time)}')
+        Text('${hourFieldsInfo["time"][_language]} $timeFormat')
       );
       _hourWidgetList.add(_getHourWidget(hour));
     }
@@ -275,7 +289,6 @@ class HomeState extends State<Home> {
   }
 
   Widget _getDayWidget(Day day) {
-    final doNotExistLable = 'not this day';
     return Container(
       child: Column(
         children: <Widget>[
@@ -299,20 +312,19 @@ class HomeState extends State<Home> {
           _getFieldDataRow(dayFieldsInfo['clouds'], day.clouds),
           _getFieldDataRow(dayFieldsInfo['wind_speed'], day.windSpeed),
           _getFieldDataRow(dayFieldsInfo['wind_degrees'], day.windDegrees),
-          _getFieldDataRow(dayFieldsInfo['wind_gust'], day.windGust ?? doNotExistLable),
-          _getFieldDataRow(dayFieldsInfo['snow'], day.snow ?? doNotExistLable),
-          _getFieldDataRow(dayFieldsInfo['rain'], day.rain ?? doNotExistLable),
+          _getFieldDataRow(dayFieldsInfo['wind_gust'], day.windGust),
+          _getFieldDataRow(dayFieldsInfo['snow'], day.snow),
+          _getFieldDataRow(dayFieldsInfo['rain'], day.rain),
         ],
       ),
     );
   }
 
   String _toTimeOfDayStr(DateTime rawTime) {
-    return DateFormat(_timeFormatOfLang).format(rawTime);
+    return DateFormat(_dayTimeFormatOfLang).format(rawTime);
   }
 
   Widget _getHourWidget(Hour hour) {
-    final doNotExistLable = 'not this hour';
     return Container(
       child: Column(
         children: <Widget>[
@@ -326,19 +338,22 @@ class HomeState extends State<Home> {
           _getFieldDataRow(hourFieldsInfo['clouds'], hour.clouds),
           _getFieldDataRow(hourFieldsInfo['wind_speed'], hour.windSpeed),
           _getFieldDataRow(hourFieldsInfo['wind_degrees'], hour.windDegrees),
-          _getFieldDataRow(hourFieldsInfo['wind_gust'], hour.windGust ?? doNotExistLable),
-          _getFieldDataRow(hourFieldsInfo['snow'], hour.snow ?? doNotExistLable),
-          _getFieldDataRow(hourFieldsInfo['rain'], hour.rain ?? doNotExistLable),
+          _getFieldDataRow(hourFieldsInfo['wind_gust'], hour.windGust),
+          _getFieldDataRow(hourFieldsInfo['snow'], hour.snow),
+          _getFieldDataRow(hourFieldsInfo['rain'], hour.rain),
         ],
       ),
     );
   }
 
   Widget _getFieldDataRow(Map<String, dynamic> fieldMap, var fieldValue) {
+    final doNotExistLable = 'not this time';
     return Row(
       children: <Widget>[
         Text('${fieldMap[_language]}: '),
-        Text('$fieldValue ${fieldMap["unit"][_language]}'),
+        fieldValue != null
+          ? Text('$fieldValue ${fieldMap["unit"][_language]}')
+          : Text(doNotExistLable),
       ],
     );
   }
@@ -371,26 +386,7 @@ class HomeState extends State<Home> {
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'Location',
-                          style: Theme.of(context).textTheme.caption,
-                        ),
-                        Text(
-                          '_currentAddress $_currentAddress',
-                          style: Theme.of(context).textTheme.caption,
-                        ),
-                        Text(
-                          '_currentPosition $_currentPosition',
-                          style: Theme.of(context).textTheme.caption,
-                        ),
-                        if (_currentPosition != null &&
-                            _currentAddress != null)
-                          Text(
-                            _currentAddress,
-                            style: Theme.of(context).textTheme.bodyText2
-                          ),
-                      ],
+                      children: _locationContent(),
                     ),
                   ),
                   SizedBox(
@@ -404,6 +400,40 @@ class HomeState extends State<Home> {
       ],
     );
   }
+
+  List<Widget> _locationContent() {
+    List<Widget> content = [
+      Text(
+        'Location',
+        style: Theme.of(context).textTheme.caption,
+      ),
+    ];
+    if (_currentPosition == null)
+      content.add(Text('Turn on GPS to update position'));
+      content.add(Text(
+        'Default position: Lat: $_latitude, Long: $_longitude',
+        style: Theme.of(context).textTheme.caption,
+      ));
+    if (_currentPosition != null) {
+      content = [content[0]];
+      content.add(Text(
+        'Current position: $_currentPosition',
+        style: Theme.of(context).textTheme.caption,
+      ));
+      if (_currentAddress != null) {
+        content.add(Text(
+          'Current address: $_currentAddress',
+          style: Theme.of(context).textTheme.caption,
+        ));
+        content.add(Text(
+          _currentAddress,
+          style: Theme.of(context).textTheme.bodyText2
+        ));
+      }
+    }
+    return content;
+  }
+
 
   List<Day> _getDaily() {
     homeBloc.updateDaily.add({
@@ -434,8 +464,11 @@ class HomeState extends State<Home> {
         .then((Position position) {
       setState(() {
         _currentPosition = position;
+        _latitude = _currentPosition.latitude;
+        _longitude = _currentPosition.longitude;
         print('_getCurrentLocation222 position: $position setState OUT');
       });
+      homeBloc.setPosition.add([_latitude, _longitude]);
       print('_getCurrentLocation333 setState After');
       _getAddressFromLatLng();
       print('_getCurrentLocation444 geolocator OUT');
@@ -448,7 +481,8 @@ class HomeState extends State<Home> {
   Future<void> _getAddressFromLatLng() async {
     try {
       List<Placemark> p = await geolocator.placemarkFromCoordinates(
-          _currentPosition.latitude, _currentPosition.longitude);
+          _currentPosition.latitude, _currentPosition.longitude
+        );
       Placemark place = p[0];
       setState(() {
         _currentAddress =

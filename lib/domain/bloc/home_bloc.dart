@@ -12,10 +12,14 @@ import 'package:weather_app/data/mapper/hour/hourly_mapper.dart';
 
 
 class HomeBloc {
-  final _defaultLanguage;
+  final String _defaultLanguage;
+  /// [latitude, longitude]
+  final List<double> _defaultPosition;
   final DailyRepository _dailyRepository;
   final HourlyRepository _hourlyRepository;
   String _language;
+  double _latitude;
+  double _longitude;
   List<Day> _daily;
   List<Hour> _hourly;
   Future<SharedPreferences> prefs = SharedPreferences.getInstance();
@@ -25,7 +29,9 @@ class HomeBloc {
   bool isLoading = false;
 
   HomeBloc(this._dailyRepository, this._hourlyRepository)
-    : _defaultLanguage = 'en' {
+    : _defaultLanguage = 'en',
+      _defaultPosition = [50.0, 30.0]
+    {
     prefs.then((val) {
       if (val.get('language') != null) {
         _language = val.getString('language') ?? _defaultLanguage;
@@ -36,6 +42,18 @@ class HomeBloc {
           .stream
           .listen(_changeLanguage);
       _setLanguage.add(_language);
+
+      if (val.get('latitude') != null && val.get('longitude') != null) {
+        _latitude = val.getDouble('latitude') ?? _defaultPosition[0];
+        _longitude = val.getDouble('longitude') ?? _defaultPosition[1];
+      } else {
+        _latitude = _defaultPosition[0];
+        _longitude = _defaultPosition[1];
+      }
+      _positionActionController
+          .stream
+          .listen(_changePosition);
+      _setPosition.add([_latitude, _longitude]);
 
       /// TODO: check for internet connection
       if (val.get('hourly') != null) {
@@ -104,6 +122,13 @@ class HomeBloc {
   Sink get _setLanguage => _languageController.sink;
   StreamController<String> _languageActionController = StreamController();
   StreamSink get setLanguage => _languageActionController.sink;
+
+  /// Position(double latitude, double longitude)
+  final BehaviorSubject<List<double>> _positionController = BehaviorSubject();
+  Stream get positionStream => _positionController.stream;
+  Sink get _setPosition => _positionController.sink;
+  StreamController<List<double>> _positionActionController = StreamController();
+  StreamSink get setPosition => _positionActionController.sink;
 
 
   void _getDailyByCoords(Map<String, double> coords) async {
@@ -179,6 +204,19 @@ class HomeBloc {
     prefs.then((val) {
       val.setString('language', _language);
     });
+  }
+
+  void _changePosition(List<double> receivedPosition) async {
+    if (receivedPosition != null) {
+      _latitude = receivedPosition[0] ?? _defaultPosition[0];
+      _longitude = receivedPosition[1] ?? _defaultPosition[1];
+
+      _setPosition.add(receivedPosition);
+      prefs.then((val) {
+        val.setDouble('latitude', _latitude);
+        val.setDouble('longitude', _longitude);
+      });
+    }
   }
 
   void init() {
