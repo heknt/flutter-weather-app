@@ -1,12 +1,18 @@
 # Weather Getter
 This app takes a weather API from [openweathermap](https://openweathermap.org) and shows it in a list format.
 
+Main features:
+- location detecting (program gets a weather API by coordinates)
+- localization feature (choose between English and Russian)
+- prefs remembering
+- API taking of daily, hourly
+
 ## Structure
 Project divided by four structure levels (data, domain (business-logic), internal, presentation).
 
 Presentation contains two screens:
 - splash - with weather-logo (shown for several sec on app start, and you can tap on image to speed up the transition).
-- home - main screen. Here is location detecting, localization feature (choose between English and Russian), and two buttons (daily, hourly) which can open API by tap.
+- home - main screen. Here is the main features, and two buttons (daily, hourly) which can open API by tap.
 
 
 ## API
