@@ -1,16 +1,30 @@
-# weather_app
+# Weather Getter
+This app takes a weather API from [openweathermap](https://openweathermap.org) and shows it in a list format.
 
-A new Flutter project.
+## Structure
+Project divided by four structure levels (data, domain (business-logic), internal, presentation).
 
-## Getting Started
+Presentation contains two screens:
+- splash - with weather-logo (shown for several sec on app start, and you can tap on image to speed up the transition).
+- home - main screen. Here is location detecting, localization feature (choose betweeb English and Russian), and two buttons (daily, hourly) which can open API by tap.
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+## API
+#### Types of taken API:
+- daily - shows weather info of each day of the next week.
+- hourly - shows weather info of each hour of the next two days.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+#### Example of API
+results in my project - [daily.json](https://github.com/heknt/flutter-weather-app/blob/master/lib/data/storage/daily.json) and [hourly.json](https://github.com/heknt/flutter-weather-app/blob/master/lib/data/storage/hourly.json)
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Running
+```bash
+$ git clone https://github.com/heknt/flutter-weather-app.git
+$ cd flutter-weather-app
+```
+Connect your phone to computer and enable USB debugging. Next:
+```bash
+flutter-weather-app$ flutter doctor
+flutter-weather-app$ flutter pub get
+flutter-weather-app$ flutter run
+```
