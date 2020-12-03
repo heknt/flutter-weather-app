@@ -43,6 +43,8 @@ class HomeScreenState extends State<HomeScreen> {
   Widget _locationWidget;
   double _latitude;
   double _longitude;
+  bool _isLoading;
+  Widget _apiContentWidget;
 
   Day _day;
   Hour _hour;
@@ -63,6 +65,7 @@ class HomeScreenState extends State<HomeScreen> {
     _language = 'en';
     _latitude = 50.0;
     _longitude = 30.0;
+    _isLoading = false;
   }
 
   @override
@@ -77,6 +80,7 @@ class HomeScreenState extends State<HomeScreen> {
     return Consumer<HomeBloc>(
       builder: (context, _homeBloc, child) {
         homeBloc = _homeBloc;
+
         return StreamBuilder<List<Day>>(
           stream: homeBloc.dailyStream,
           builder: (context, snapshot) {
@@ -84,12 +88,7 @@ class HomeScreenState extends State<HomeScreen> {
               _daily = snapshot.data;
               print('hass Daily');
             } else { print('hass NOT Daily Dataa'); }
-            // else {
-            //   return _whileLoading();
-            // } 
-            pressed
-              ? print('snapshot.data ${snapshot.data}')
-              : print('not pressed yet.');
+
             return StreamBuilder<List<Hour>>(
               stream: homeBloc.hourlyStream,
               builder: (context, snapshot) {
@@ -97,20 +96,16 @@ class HomeScreenState extends State<HomeScreen> {
                   _hourly = snapshot.data;
                   print('hass Hourly');
                 } else { print('hass NOT Hourly Dataa'); }
-                // else {
-                //   return _whileLoading();
-                // }
+
                 return StreamBuilder<String>(
                   stream: homeBloc.languageStream,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       _language = snapshot.data;
-                      _dateFormatOfLang = _language == 'en'
-                        ? 'EEEE, MMMM d'
-                        : 'dd-MM-yyyy';
-                      _dayTimeFormatOfLang = _language == 'en'
-                        ? 'h:mm a'
-                        : 'k:mm';
+                      _dateFormatOfLang =
+                          localePhrases['time']['date_format'][_language];
+                      _dayTimeFormatOfLang =
+                          localePhrases['time']['day_time_format'][_language];
                       print('hass Language $_language');
                     } else { print('hass NOT Language Dataa'); }
                     
@@ -124,7 +119,17 @@ class HomeScreenState extends State<HomeScreen> {
                           print('hass Position ${snapshot.data}');
                         } else { print('hass NOT Hourly Dataa'); }
 
-                        return _futureBuilderLocation();
+                        return StreamBuilder<bool>(
+                          stream: homeBloc.isLoadingStream,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              _isLoading = snapshot.data;
+                              print('hass isLoading ${snapshot.data}');
+                            } else { print('hass NOT isLoading Dataa'); }
+
+                            return _futureBuilderLocation();
+                          },
+                        );
                       },
                     );
                   },
@@ -157,7 +162,10 @@ class HomeScreenState extends State<HomeScreen> {
           _languageChooser(),
         ],
       ),
-      body: _contentColumn(),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: _contentColumn(),
+      ),
     );
   }
 
@@ -167,10 +175,10 @@ class HomeScreenState extends State<HomeScreen> {
       icon: Icon(Icons.arrow_downward),
       iconSize: 24,
       elevation: 16,
-      // style: TextStyle(color: Colors.white),
+      style: TextStyle(color: Colors.brown),
       underline: Container(
         height: 2,
-        // color: Colors.white,
+        color: Colors.brown,
       ),
       onChanged: (String chosenLang) {
         setState(() {
@@ -182,7 +190,10 @@ class HomeScreenState extends State<HomeScreen> {
           .map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(value),
+          child: Text(
+            value,
+            style: TextStyle(fontSize: 20),
+          ),
         );
       }).toList(),
     );
@@ -195,25 +206,28 @@ class HomeScreenState extends State<HomeScreen> {
         children: <Widget>[
           _locationWidget,
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              RaisedButton(
-                child: Text('Daily'),
-                onPressed: _getDaily,
+              Padding(
+                padding: EdgeInsets.all(5.0),
+                child: RaisedButton(
+                  child: Text(localePhrases['data']['daily'][_language]),
+                  onPressed: _getDaily,
+                ),
               ),
-              RaisedButton(
-                child: Text('Hourly'),
-                onPressed: _getHourly,
+              Padding(
+                padding: EdgeInsets.all(5.0),
+                child: RaisedButton(
+                  child: Text(localePhrases['data']['hourly'][_language]),
+                  onPressed: _getHourly,
+                ),
               ),
             ],
           ),
-          // if (pressed) {
-            _daily != null
-              ? _showDaily(_daily) ?? Text('_daily is null')
-              : Text('no _daily'),
-            _hourly != null
-              ? _showHourly(_hourly) ?? Text('_hourly is null')
-              : Text('no _hourly'),
-          // }
+          _isLoading
+            ? _whileLoading()
+            : _apiContentWidget
+              ?? Text(localePhrases['data']['data_is_coming'][_language]),
         ],
       ),
     );
@@ -224,7 +238,7 @@ class HomeScreenState extends State<HomeScreen> {
       ? Column(
           children: _getDayWidgetList(dayList),
         )
-      : Text('_showDaily error: dayList is null');
+      : Text(localePhrases['data']['press_one_more']['daily'][_language]);
   }
 
   Widget _showHourly(List<Hour> hourList) {
@@ -232,13 +246,12 @@ class HomeScreenState extends State<HomeScreen> {
       ? Column(
           children: _getHourWidgetList(hourList),
         )
-      : Text('_showHourly error: hourList is null');
+      : Text(localePhrases['data']['press_one_more']['hourly'][_language]);
   }
 
 
   List<Widget> _getDayWidgetList(List<Day> dayList) {
     List<Widget> _dayWidgetList = [];
-    
 
     for (final day in dayList) {
       _dayWidgetList.add(
@@ -246,7 +259,9 @@ class HomeScreenState extends State<HomeScreen> {
       );
       String timeFormat = DateFormat(_dateFormatOfLang).format(day.time);
       _dayWidgetList.add(
-        Text('${dayFieldsInfo["time"][_language]} $timeFormat')
+        Text('${dayFieldsInfo["time"][_language]} $timeFormat',
+          style: _titleStyle(),
+        )
       );
       _dayWidgetList.add(_getDayWidget(day));
     }
@@ -267,11 +282,21 @@ class HomeScreenState extends State<HomeScreen> {
       String timeFormat =
           DateFormat("$_dayTimeFormatOfLang, $_dateFormatOfLang").format(hour.time);
       _hourWidgetList.add(
-        Text('${hourFieldsInfo["time"][_language]} $timeFormat')
+        Text('${hourFieldsInfo["time"][_language]} $timeFormat',
+          style: _titleStyle(),
+        )
       );
       _hourWidgetList.add(_getHourWidget(hour));
     }
     return _hourWidgetList;
+  }
+
+  TextStyle _titleStyle() {
+    return TextStyle(
+      height: 3,
+      fontSize: 16,
+      fontStyle: FontStyle.italic,
+    );
   }
 
   Widget _getIconFromNetwork(
@@ -347,13 +372,25 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _getFieldDataRow(Map<String, dynamic> fieldMap, var fieldValue) {
-    final doNotExistLable = 'not this time';
+    final doNotExistLable = localePhrases['data']['do_not_exist_lable'][_language];
+    TextStyle _fieldStyle = TextStyle(
+        fontSize: 15,
+      );
     return Row(
       children: <Widget>[
-        Text('${fieldMap[_language]}: '),
+        Text('${fieldMap[_language]}: ',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+          ),
+        ),
         fieldValue != null
-          ? Text('$fieldValue ${fieldMap["unit"][_language]}')
-          : Text(doNotExistLable),
+          ? Text('$fieldValue ${fieldMap["unit"][_language]}',
+              style: _fieldStyle,
+            )
+          : Text(doNotExistLable,
+              style: _fieldStyle,
+            ),
       ],
     );
   }
@@ -404,25 +441,25 @@ class HomeScreenState extends State<HomeScreen> {
   List<Widget> _locationContent() {
     List<Widget> content = [
       Text(
-        'Location',
+        localePhrases['location'][_language],
         style: Theme.of(context).textTheme.caption,
       ),
     ];
     if (_currentPosition == null)
-      content.add(Text('Turn on GPS to update position'));
+      content.add(Text(localePhrases['location']['update_position'][_language]));
       content.add(Text(
-        'Default position: Lat: $_latitude, Long: $_longitude',
+        "${localePhrases['location']['default_position'][_language]}: Lat: $_latitude, Long: $_longitude",
         style: Theme.of(context).textTheme.caption,
       ));
     if (_currentPosition != null) {
       content = [content[0]];
       content.add(Text(
-        'Current position: $_currentPosition',
+        '${localePhrases['location']['current_position'][_language]}: $_currentPosition',
         style: Theme.of(context).textTheme.caption,
       ));
       if (_currentAddress != null) {
         content.add(Text(
-          'Current address: $_currentAddress',
+          '${localePhrases['location']['current_address'][_language]}: $_currentAddress',
           style: Theme.of(context).textTheme.caption,
         ));
         content.add(Text(
@@ -441,6 +478,7 @@ class HomeScreenState extends State<HomeScreen> {
       'longitude': _longitude,
     });
     print('home.dart: daily: $_daily');
+    _apiContentWidget = _showDaily(_daily);
     return _daily;
   }
 
@@ -450,12 +488,13 @@ class HomeScreenState extends State<HomeScreen> {
       'longitude': _longitude,
     });
     print('home.dart: hourly: $_hourly');
+    _apiContentWidget = _showHourly(_hourly);
     return _hourly;
   }
 
 
   Future<void> _getCurrentLocation() async {
-    print('_getCurrentLocation111 IN');
+    // print('_getCurrentLocation111 IN');
     geolocator =
       await Geolocator()..forceAndroidLocationManager;
     geolocator
@@ -466,16 +505,16 @@ class HomeScreenState extends State<HomeScreen> {
         _currentPosition = position;
         _latitude = _currentPosition.latitude;
         _longitude = _currentPosition.longitude;
-        print('_getCurrentLocation222 position: $position setState OUT');
+        // print('_getCurrentLocation222 position: $position setState OUT');
       });
       homeBloc.setPosition.add([_latitude, _longitude]);
-      print('_getCurrentLocation333 setState After');
+      // print('_getCurrentLocation333 setState After');
       _getAddressFromLatLng();
-      print('_getCurrentLocation444 geolocator OUT');
+      // print('_getCurrentLocation444 geolocator OUT');
     }).catchError((e) {
       print(e);
     });
-    print('_getCurrentLocation555 OUT');
+    // print('_getCurrentLocation555 OUT');
   }
 
   Future<void> _getAddressFromLatLng() async {
@@ -501,6 +540,7 @@ class HomeScreenState extends State<HomeScreen> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    super.dispose();
   }
 }
 

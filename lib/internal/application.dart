@@ -10,7 +10,7 @@ import 'routes.dart';
 
 
 class Application extends StatelessWidget {
-  static const _title = 'Revolution<ohh,Weather,I mean>';
+  static const _title = 'Weather Getter';
 
   @override
   Widget build(BuildContext context) {

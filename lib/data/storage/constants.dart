@@ -1,5 +1,68 @@
 // import 'package:weather_app/data/api/services/openweathermap_service.dart';
 
+Map<String, dynamic> localePhrases = {
+  'location': {
+      'en': 'Location',
+      'ru': 'Локация',
+      'update_position': {
+        'en': 'Turn on GPS to update position',
+        'ru': 'Включите GPS, чтобы обновить позицию',
+      },
+      'default_position': {
+        'en': 'Default position',
+        'ru': 'Позиция по-умолчанию',
+      },
+      'current_position': {
+        'en': 'Current position',
+        'ru': 'Текущая позиция',
+      },
+      'current_address': {
+        'en': 'Current address',
+        'ru': 'Текущий адрес',
+      }
+
+    },
+  'data': {
+    'do_not_exist_lable': {
+      'en': 'not this time',
+      'ru': 'не в это время'
+    },
+    'data_is_coming': {
+      'en': 'Weather data is coming.. Press a button.',
+      'ru': 'Данные приближаются.. Нажмите на кнопку.'
+    },
+    'hourly': {
+      'en': 'Hourly',
+      'ru': 'По часам',
+    },
+    'daily': {
+      'en': 'Daily',
+      'ru': 'По дням',
+    },
+    'press_one_more': {
+      'daily': {
+        'en': 'Press one more "Daily", please',
+        'ru': 'Нажмите ещё раз "По дням"',
+      },
+      'hourly': {
+        'en': 'Press one more "Hourly", please',
+        'ru': 'Нажмите ещё раз "По часам"',
+      },
+    }
+  },
+  'time': {
+    'date_format': {
+      'en': 'EEEE, MMMM d',
+      'ru': 'dd-MM-yyyy',
+    },
+    'day_time_format': {
+      'en': 'h:mm a',
+      'ru': 'k:mm',
+    },
+  },
+
+};
+
 
 Map<String, dynamic> dayFieldsInfo = {
   'time': {

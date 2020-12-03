@@ -88,17 +88,9 @@ class HomeBloc {
   Stream<List<Day>> get dailyStream => _dailyController.stream;
   Sink get _updateDaily => _dailyController.sink;
   // void get resetDaily => _dailyActionController.sink.add(null);
-  /// for SharedPreferences
   StreamController<Map<String, double>> _dailyActionController =
       StreamController();
   StreamSink get updateDaily => _dailyActionController.sink;
-
-  /// Chosen Day
-  final BehaviorSubject<Day> _currDayController = BehaviorSubject();
-  Stream get currDayStream => _currDayController.stream;
-  Sink get _setCurrDay => _currDayController.sink;
-  StreamController _currDayActionController = StreamController();
-  StreamSink get setCurrDay => _currDayActionController.sink;
 
 
   /// Hourly Api
@@ -109,12 +101,6 @@ class HomeBloc {
       StreamController();
   StreamSink get updateHourly => _hourlyActionController.sink;
 
-  /// Chosen Hour
-  final BehaviorSubject<Hour> _currHourController = BehaviorSubject();
-  Stream get currHourStream => _currHourController.stream;
-  Sink get _setCurrHour => _currHourController.sink;
-  StreamController _currHourActionController = StreamController();
-  StreamSink get setCurrHour => _currHourActionController.sink;
 
   /// Language
   final BehaviorSubject<String> _languageController = BehaviorSubject();
@@ -130,6 +116,11 @@ class HomeBloc {
   StreamController<List<double>> _positionActionController = StreamController();
   StreamSink get setPosition => _positionActionController.sink;
 
+  /// isLoading
+  final BehaviorSubject<bool> _isLoadingController = BehaviorSubject();
+  Stream get isLoadingStream => _isLoadingController.stream;
+  Sink get _setIsLoading => _isLoadingController.sink;
+
 
   void _getDailyByCoords(Map<String, double> coords) async {
     await _getDaily(
@@ -144,7 +135,7 @@ class HomeBloc {
     @required double longitude,
     @required String language,
   }) async {
-    isLoading = true;
+    _setIsLoading.add(true);
     final data = await _dailyRepository.getDaily(
       latitude: latitude,
       longitude: longitude,
@@ -153,13 +144,13 @@ class HomeBloc {
     
     if (data != null) {
       print('daily data: $data with time ${data[0].time}');
-      // _daily = [data];
-      _updateDaily.add(data);
+      _daily = data;
+      _updateDaily.add(_daily);
       prefs.then((val) {
-        // val.setString('daily', DailyMapper.encode(data));
+        val.setString('daily', DailyMapper.encode(_daily));
       });
     }
-    isLoading = false;
+    _setIsLoading.add(false);
   }
 
   void _getHourlyByCoords(Map<String, double> coords) async {
@@ -175,7 +166,7 @@ class HomeBloc {
     @required double longitude,
     @required String language,
   }) async {
-    isLoading = true;
+    _setIsLoading.add(true);
     final data = await _hourlyRepository.getHourly(
       latitude: latitude,
       longitude: longitude,
@@ -184,13 +175,13 @@ class HomeBloc {
 
     if (data != null) {
       print('hourly data: $data');
-      // _hourly = [data];
-      _updateHourly.add(data);
+      _hourly = data;
+      _updateHourly.add(_hourly);
       prefs.then((val) {
-        // val.setString('hourly', HourlyMapper.encode(data));
+        val.setString('hourly', HourlyMapper.encode(_hourly));
       });
     }
-    isLoading = false;
+    _setIsLoading.add(false);
   }
 
   void _chooseDay() {
@@ -228,11 +219,9 @@ class HomeBloc {
     _dailyController.close();
     _dailyActionController.close();
     _currDayController.close();
-    // _currDayActionController.close();
     _hourlyController.close();
     _hourlyActionController.close();
     _currHourController.close();
-    // _currHourActionController.close();
     _languageController.close();
     _languageActionController.close();
   }

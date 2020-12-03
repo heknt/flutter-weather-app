@@ -43,9 +43,9 @@ class DayMapper {
   }
 
   static Map<String, dynamic> toMap(Day day) => {
-      'time': day.time,
-      'sunrise': day.sunrise,
-      'sunset': day.sunset,
+      'time': day.time.millisecondsSinceEpoch,
+      'sunrise': day.sunrise.millisecondsSinceEpoch,
+      'sunset': day.sunset.millisecondsSinceEpoch,
       'weatherMain': day.weatherMain,
       'weatherDesc': day.weatherDesc,
       'weatherIconCode': day.weatherIconCode,
@@ -72,9 +72,12 @@ class DayMapper {
 
   static Day fromJson(Map<String, dynamic> jsonData) {
     return Day(
-      time: jsonData['time'],
-      sunrise: jsonData['sunrise'],
-      sunset: jsonData['sunset'],
+      time: DateTime.fromMillisecondsSinceEpoch(
+        jsonData['time']),
+      sunrise: DateTime.fromMillisecondsSinceEpoch(
+        jsonData['sunrise']),
+      sunset: DateTime.fromMillisecondsSinceEpoch(
+        jsonData['sunset']),
       weatherMain: jsonData['weatherMain'],
       weatherDesc: jsonData['weatherDesc'],
       weatherIconCode: jsonData['weatherIconCode'],

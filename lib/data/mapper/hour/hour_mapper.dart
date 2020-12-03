@@ -30,7 +30,7 @@ class HourMapper {
   }
 
   static Map<String, dynamic> toMap(Hour hour) => {
-      'time': hour.time,
+      'time': hour.time.millisecondsSinceEpoch,
       'weatherMain': hour.weatherMain,
       'weatherDesc': hour.weatherDesc,
       'weatherIconCode': hour.weatherIconCode,
@@ -49,7 +49,8 @@ class HourMapper {
 
   static Hour fromJson(Map<String, dynamic> jsonData) {
     return Hour(
-      time: jsonData['time'],
+      time: DateTime.fromMillisecondsSinceEpoch(
+        jsonData['time']),
       weatherMain: jsonData['weatherMain'],
       weatherDesc: jsonData['weatherDesc'],
       weatherIconCode: jsonData['weatherIconCode'],
