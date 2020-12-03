@@ -212,14 +212,22 @@ class HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.all(5.0),
                 child: RaisedButton(
                   child: Text(localePhrases['data']['daily'][_language]),
-                  onPressed: _getDaily,
+                  onPressed: () {
+                    setState(() {
+                      _apiContentWidget = _showDaily(_getDaily());
+                    });
+                  },
                 ),
               ),
               Padding(
                 padding: EdgeInsets.all(5.0),
                 child: RaisedButton(
                   child: Text(localePhrases['data']['hourly'][_language]),
-                  onPressed: _getHourly,
+                  onPressed: () {
+                    setState(() {
+                      _apiContentWidget = _showHourly(_getHourly());
+                    });
+                  },
                 ),
               ),
             ],
@@ -475,10 +483,10 @@ class HomeScreenState extends State<HomeScreen> {
           '${localePhrases['location']['current_address'][_language]}: $_currentAddress',
           style: Theme.of(context).textTheme.caption,
         ));
-        content.add(Text(
-          _currentAddress,
-          style: Theme.of(context).textTheme.bodyText2
-        ));
+        // content.add(Text(
+        //   _currentAddress,
+        //   style: Theme.of(context).textTheme.bodyText2
+        // ));
       }
     }
     return content;
@@ -491,9 +499,9 @@ class HomeScreenState extends State<HomeScreen> {
       'longitude': _longitude,
     });
     print('home.dart: daily: $_daily');
-    setState(() {
-      _apiContentWidget = _showDaily(_daily);
-    });
+    // setState(() {
+    //   _apiContentWidget = _showDaily(_daily);
+    // });
     return _daily;
   }
 
@@ -503,9 +511,9 @@ class HomeScreenState extends State<HomeScreen> {
       'longitude': _longitude,
     });
     print('home.dart: hourly: $_hourly');
-    setState(() {
-      _apiContentWidget = _showHourly(_hourly);
-    });
+    // setState(() {
+    //   _apiContentWidget = _showHourly(_hourly);
+    // });
     return _hourly;
   }
 

@@ -147,7 +147,7 @@ class HomeBloc {
       _daily = data;
       _updateDaily.add(_daily);
       prefs.then((val) {
-        val.setString('daily', DailyMapper.encode(_daily));
+        val.setString('daily', null);
       });
     }
     _setIsLoading.add(false);
@@ -178,7 +178,7 @@ class HomeBloc {
       _hourly = data;
       _updateHourly.add(_hourly);
       prefs.then((val) {
-        val.setString('hourly', HourlyMapper.encode(_hourly));
+        val.setString('hourly', null);
       });
     }
     _setIsLoading.add(false);
