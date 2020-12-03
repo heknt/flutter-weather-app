@@ -184,10 +184,6 @@ class HomeBloc {
     _setIsLoading.add(false);
   }
 
-  void _chooseDay() {
-
-  }
-
   void _changeLanguage(String chosenLang) async {
     _language = chosenLang ?? _defaultLanguage;
 
@@ -210,18 +206,12 @@ class HomeBloc {
     }
   }
 
-  void init() {
-
-  }
-
   void dispose() {
     print('HomeBloc dispose');
     _dailyController.close();
     _dailyActionController.close();
-    _currDayController.close();
     _hourlyController.close();
     _hourlyActionController.close();
-    _currHourController.close();
     _languageController.close();
     _languageActionController.close();
   }

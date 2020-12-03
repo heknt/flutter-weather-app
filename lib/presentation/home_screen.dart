@@ -315,6 +315,8 @@ class HomeScreenState extends State<HomeScreen> {
 
   Widget _getDayWidget(Day day) {
     return Container(
+      padding: const EdgeInsets.all(10.0),
+      decoration: _boxDecorWidget(),
       child: Column(
         children: <Widget>[
           _getFieldDataRow(dayFieldsInfo['sunrise'], _toTimeOfDayStr(day.sunrise)),
@@ -351,6 +353,8 @@ class HomeScreenState extends State<HomeScreen> {
 
   Widget _getHourWidget(Hour hour) {
     return Container(
+      padding: const EdgeInsets.all(10.0),
+      decoration: _boxDecorWidget(),
       child: Column(
         children: <Widget>[
           _getFieldDataRow(hourFieldsInfo['weather_main'], hour.weatherMain),
@@ -368,6 +372,15 @@ class HomeScreenState extends State<HomeScreen> {
           _getFieldDataRow(hourFieldsInfo['rain'], hour.rain),
         ],
       ),
+    );
+  }
+
+  BoxDecoration _boxDecorWidget() {
+    return BoxDecoration(
+      border: Border.all(
+        color: Colors.brown[500],
+      ),
+      borderRadius: BorderRadius.all(Radius.circular(8))
     );
   }
 
@@ -478,7 +491,9 @@ class HomeScreenState extends State<HomeScreen> {
       'longitude': _longitude,
     });
     print('home.dart: daily: $_daily');
-    _apiContentWidget = _showDaily(_daily);
+    setState(() {
+      _apiContentWidget = _showDaily(_daily);
+    });
     return _daily;
   }
 
@@ -488,7 +503,9 @@ class HomeScreenState extends State<HomeScreen> {
       'longitude': _longitude,
     });
     print('home.dart: hourly: $_hourly');
-    _apiContentWidget = _showHourly(_hourly);
+    setState(() {
+      _apiContentWidget = _showHourly(_hourly);
+    });
     return _hourly;
   }
 
