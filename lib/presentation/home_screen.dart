@@ -51,7 +51,7 @@ class HomeScreenState extends State<HomeScreen> {
   List<Day> _daily;
   List<Hour> _hourly;
   HomeBloc homeBloc;
-  bool pressed = false;
+  bool pressed;
 
   @override
   void initState() {
@@ -66,6 +66,7 @@ class HomeScreenState extends State<HomeScreen> {
     _latitude = 50.0;
     _longitude = 30.0;
     _isLoading = false;
+    pressed = false;
   }
 
   @override
@@ -86,6 +87,10 @@ class HomeScreenState extends State<HomeScreen> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               _daily = snapshot.data;
+              if (pressed) {
+                _apiContentWidget = _showDaily();
+                pressed = false;
+              }
               print('hass Daily');
             } else { print('hass NOT Daily Dataa'); }
 
@@ -94,6 +99,10 @@ class HomeScreenState extends State<HomeScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   _hourly = snapshot.data;
+                  if (pressed) {
+                    _apiContentWidget = _showHourly();
+                    pressed = false;
+                  }
                   print('hass Hourly');
                 } else { print('hass NOT Hourly Dataa'); }
 
@@ -214,8 +223,9 @@ class HomeScreenState extends State<HomeScreen> {
                   child: Text(localePhrases['data']['daily'][_language]),
                   onPressed: () {
                     setState(() {
-                      _apiContentWidget = _showDaily(_getDaily());
+                      pressed = true;
                     });
+                    _daily = _getDaily();
                   },
                 ),
               ),
@@ -225,8 +235,9 @@ class HomeScreenState extends State<HomeScreen> {
                   child: Text(localePhrases['data']['hourly'][_language]),
                   onPressed: () {
                     setState(() {
-                      _apiContentWidget = _showHourly(_getHourly());
+                      pressed = true;
                     });
+                    _hourly = _getHourly();
                   },
                 ),
               ),
