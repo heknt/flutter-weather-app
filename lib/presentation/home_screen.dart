@@ -88,7 +88,7 @@ class HomeScreenState extends State<HomeScreen> {
             if (snapshot.hasData) {
               _daily = snapshot.data;
               if (pressed) {
-                _apiContentWidget = _showDaily();
+                _apiContentWidget = _showDaily(_daily);
                 pressed = false;
               }
               print('hass Daily');
@@ -100,7 +100,7 @@ class HomeScreenState extends State<HomeScreen> {
                 if (snapshot.hasData) {
                   _hourly = snapshot.data;
                   if (pressed) {
-                    _apiContentWidget = _showHourly();
+                    _apiContentWidget = _showHourly(_hourly);
                     pressed = false;
                   }
                   print('hass Hourly');
