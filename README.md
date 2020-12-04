@@ -28,6 +28,8 @@ results in my project - [daily.json](https://github.com/heknt/flutter-weather-ap
 $ git clone https://github.com/heknt/flutter-weather-app.git
 $ cd flutter-weather-app
 ```
+Set your own [openweathermap AppId](https://openweathermap.org/appid) in project [service config](https://github.com/heknt/flutter-weather-app/lib/data/api/services/settings/config.dart)
+
 Connect your phone to computer and enable USB debugging. Next:
 ```bash
 flutter-weather-app$ flutter doctor
