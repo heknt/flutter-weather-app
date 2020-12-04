@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:meta/meta.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:weather_app/domain/repository/day/daily_repository.dart';
 import 'package:weather_app/domain/repository/hour/hourly_repository.dart';
 import 'package:weather_app/domain/model/day/day.dart';
 import 'package:weather_app/domain/model/hour/hour.dart';
 import 'package:weather_app/data/mapper/day/daily_mapper.dart';
 import 'package:weather_app/data/mapper/hour/hourly_mapper.dart';
+import 'package:weather_app/internal/internet_check.dart';
 
 
 class HomeBloc {
@@ -55,7 +57,6 @@ class HomeBloc {
           .listen(_changePosition);
       _setPosition.add([_latitude, _longitude]);
 
-      /// TODO: check for internet connection
       if (val.get('hourly') != null) {
         final _hourlyStr = val.getString('hourly');
         if (_hourlyStr != null) {
@@ -65,7 +66,6 @@ class HomeBloc {
       }
       _hourlyActionController
           .stream
-          // .debounce(new Duration(milliseconds: 500))
           .listen(_getHourlyByCoords);
 
       if (val.get('daily') != null) {
@@ -77,14 +77,13 @@ class HomeBloc {
       }
       _dailyActionController
           .stream
-          // .debounce(new Duration(milliseconds: 500))
           .listen(_getDailyByCoords);
     });
   }
 
 
   /// Daily Api
-  final StreamController<List<Day>> _dailyController = StreamController.broadcast();
+  final StreamController<List<Day>> _dailyController = BehaviorSubject();
   Stream<List<Day>> get dailyStream => _dailyController.stream;
   Sink get _updateDaily => _dailyController.sink;
   // void get resetDaily => _dailyActionController.sink.add(null);
@@ -94,7 +93,7 @@ class HomeBloc {
 
 
   /// Hourly Api
-  final StreamController<List<Hour>> _hourlyController = StreamController.broadcast();
+  final StreamController<List<Hour>> _hourlyController = BehaviorSubject();
   Stream<List<Hour>> get hourlyStream => _hourlyController.stream;
   Sink get _updateHourly => _hourlyController.sink;
   StreamController<Map<String, double>> _hourlyActionController =
@@ -136,18 +135,29 @@ class HomeBloc {
     @required String language,
   }) async {
     _setIsLoading.add(true);
-    final data = await _dailyRepository.getDaily(
-      latitude: latitude,
-      longitude: longitude,
-      language: language
-    );
-    
-    if (data != null) {
-      print('daily data: $data with time ${data[0].time}');
-      _daily = data;
-      _updateDaily.add(_daily);
+    if (await isExistConnection()) {
+      print('connection exist');
+      final data = await _dailyRepository.getDaily(
+        latitude: latitude,
+        longitude: longitude,
+        language: language
+      );
+
+      if (data != null) {
+        print('daily data: $data with time ${data[0].time}');
+        _daily = data;
+        _updateDaily.add(_daily);
+        prefs.then((val) {
+          val.setString('daily', DailyMapper.encode(data));
+        });
+      }
+    } else {
+      print('connection does NOT exist');
       prefs.then((val) {
-        val.setString('daily', null);
+        final _dailyStr = val.getString('daily');
+        _daily = DailyMapper.decode(_dailyStr);
+        _updateHourly.add(null);
+        _updateDaily.add(_daily);
       });
     }
     _setIsLoading.add(false);
@@ -167,18 +177,29 @@ class HomeBloc {
     @required String language,
   }) async {
     _setIsLoading.add(true);
-    final data = await _hourlyRepository.getHourly(
-      latitude: latitude,
-      longitude: longitude,
-      language: language
-    );
+    if (await isExistConnection()) {
+      print('connection exist');
+      final data = await _hourlyRepository.getHourly(
+        latitude: latitude,
+        longitude: longitude,
+        language: language
+      );
 
-    if (data != null) {
-      print('hourly data: $data');
-      _hourly = data;
-      _updateHourly.add(_hourly);
+      if (data != null) {
+        print('hourly data: $data');
+        _hourly = data;
+        _updateHourly.add(_hourly);
+        prefs.then((val) {
+          val.setString('hourly', HourlyMapper.encode(data));
+        });
+      }
+    } else {
+      print('connection does NOT exist');
       prefs.then((val) {
-        val.setString('hourly', null);
+        final _hourlyStr = val.getString('hourly');
+        _hourly = HourlyMapper.decode(_hourlyStr);
+        _updateHourly.add(null);
+        _updateHourly.add(_hourly);
       });
     }
     _setIsLoading.add(false);

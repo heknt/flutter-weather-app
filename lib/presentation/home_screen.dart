@@ -13,7 +13,6 @@ import 'package:weather_app/domain/bloc/home_bloc.dart';
 import 'package:weather_app/data/storage/constants.dart';
 // import 'package:weather_app/data/api/services/openweathermap_service.dart';
 
-
 bool isTablet() {
   Size size = window.physicalSize;
   double ratio = window.devicePixelRatio;
@@ -46,12 +45,11 @@ class HomeScreenState extends State<HomeScreen> {
   bool _isLoading;
   Widget _apiContentWidget;
 
-  Day _day;
-  Hour _hour;
   List<Day> _daily;
   List<Hour> _hourly;
   HomeBloc homeBloc;
-  bool pressed;
+  bool dailyPressed;
+  bool hourlyPressed;
 
   @override
   void initState() {
@@ -66,7 +64,8 @@ class HomeScreenState extends State<HomeScreen> {
     _latitude = 50.0;
     _longitude = 30.0;
     _isLoading = false;
-    pressed = false;
+    dailyPressed = false;
+    hourlyPressed = false;
   }
 
   @override
@@ -87,9 +86,10 @@ class HomeScreenState extends State<HomeScreen> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               _daily = snapshot.data;
-              if (pressed) {
-                _apiContentWidget = _showDaily();
-                pressed = false;
+              if (dailyPressed) {
+                _apiContentWidget = _showDaily(_daily);
+                print('showing daily stream');
+                dailyPressed = false;
               }
               print('hass Daily');
             } else { print('hass NOT Daily Dataa'); }
@@ -99,9 +99,10 @@ class HomeScreenState extends State<HomeScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   _hourly = snapshot.data;
-                  if (pressed) {
-                    _apiContentWidget = _showHourly();
-                    pressed = false;
+                  if (hourlyPressed) {
+                    _apiContentWidget = _showHourly(_hourly);
+                    print('showing hourly stream');
+                    hourlyPressed = false;
                   }
                   print('hass Hourly');
                 } else { print('hass NOT Hourly Dataa'); }
@@ -223,7 +224,7 @@ class HomeScreenState extends State<HomeScreen> {
                   child: Text(localePhrases['data']['daily'][_language]),
                   onPressed: () {
                     setState(() {
-                      pressed = true;
+                      dailyPressed = true;
                     });
                     _daily = _getDaily();
                   },
@@ -235,7 +236,7 @@ class HomeScreenState extends State<HomeScreen> {
                   child: Text(localePhrases['data']['hourly'][_language]),
                   onPressed: () {
                     setState(() {
-                      pressed = true;
+                      hourlyPressed = true;
                     });
                     _hourly = _getHourly();
                   },
@@ -492,12 +493,8 @@ class HomeScreenState extends State<HomeScreen> {
       if (_currentAddress != null) {
         content.add(Text(
           '${localePhrases['location']['current_address'][_language]}: $_currentAddress',
-          style: Theme.of(context).textTheme.caption,
+          style: Theme.of(context).textTheme.bodyText2,
         ));
-        // content.add(Text(
-        //   _currentAddress,
-        //   style: Theme.of(context).textTheme.bodyText2
-        // ));
       }
     }
     return content;
@@ -510,9 +507,6 @@ class HomeScreenState extends State<HomeScreen> {
       'longitude': _longitude,
     });
     print('home.dart: daily: $_daily');
-    // setState(() {
-    //   _apiContentWidget = _showDaily(_daily);
-    // });
     return _daily;
   }
 
@@ -522,9 +516,6 @@ class HomeScreenState extends State<HomeScreen> {
       'longitude': _longitude,
     });
     print('home.dart: hourly: $_hourly');
-    // setState(() {
-    //   _apiContentWidget = _showHourly(_hourly);
-    // });
     return _hourly;
   }
 
