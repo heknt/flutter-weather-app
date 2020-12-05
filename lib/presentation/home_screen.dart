@@ -86,7 +86,7 @@ class HomeScreenState extends State<HomeScreen> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               _daily = snapshot.data;
-    if (dailyPressed) {
+              if (dailyPressed) {
                 _apiContentWidget = _showDaily(_daily);
                 print('showing daily stream');
                 dailyPressed = false;
@@ -99,7 +99,7 @@ class HomeScreenState extends State<HomeScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   _hourly = snapshot.data;
-        if (hourlyPressed) {
+                  if (hourlyPressed) {
                     _apiContentWidget = _showHourly(_hourly);
                     print('showing hourly stream');
                     hourlyPressed = false;
