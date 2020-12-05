@@ -162,7 +162,7 @@ Map<String, dynamic> dayFieldsInfo = {
       'ru': '°C',
     },
     'en': 'Day Temp. feels like',
-    'ru': 'Температура днём ощущается как',
+    'ru': 'Темп. днём ощущается как',
   },
   'night_temp_feels_like': {
     'unit': {
@@ -170,7 +170,7 @@ Map<String, dynamic> dayFieldsInfo = {
       'ru': '°C',
     },
     'en': 'Night Temp. feels like',
-    'ru': 'Температура ночью ощущается как',
+    'ru': 'Темп. ночью ощущается как',
   },
   'eve_temp_feels_like': {
     'unit': {
@@ -178,7 +178,7 @@ Map<String, dynamic> dayFieldsInfo = {
       'ru': '°C',
     },
     'en': 'Evening Temp. feels like',
-    'ru': 'Температура вечером ощущается как',
+    'ru': 'Темп. вечером ощущается как',
   },
   'morn_temp_feels_like': {
     'unit': {
@@ -186,7 +186,7 @@ Map<String, dynamic> dayFieldsInfo = {
       'ru': '°C',
     },
     'en': 'Morning Temp. feels like',
-    'ru': 'Температура утром ощущается как',
+    'ru': 'Темп. утром ощущается как',
   },
   'pressure': {
     'unit': {
