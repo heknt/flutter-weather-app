@@ -19,7 +19,6 @@ class HourMapper {
       clouds: hour.clouds.toInt(),
       windSpeed: hour.windSpeed,
       windDegrees: hour.windDegrees.toInt(),
-      windGust: hour.windGust,
       snow: hour.snow != null
         ? hour.snow*100
         : null,
@@ -42,7 +41,6 @@ class HourMapper {
       'clouds': hour.clouds,
       'windSpeed': hour.windSpeed,
       'windDegrees': hour.windDegrees,
-      'windGust': hour.windGust,
       'snow': hour.snow,
       'rain': hour.rain,
     };
@@ -62,7 +60,6 @@ class HourMapper {
       clouds: jsonData['clouds'],
       windSpeed: jsonData['windSpeed'],
       windDegrees: jsonData['windDegrees'],
-      windGust: jsonData['windGust'],
       snow: jsonData['snow'],
       rain: jsonData['rain'],
     );

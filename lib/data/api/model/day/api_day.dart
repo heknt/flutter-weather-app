@@ -21,7 +21,6 @@ class ApiDay {
   final num clouds; // Cloudiness, %
   final num windSpeed; // [metre/sec]
   final num windDegrees;
-  final num windGust;
   final num snow;
   final num rain;
 
@@ -48,9 +47,6 @@ class ApiDay {
       clouds = map['daily'][_index]['clouds'],
       windSpeed = map['daily'][_index]['wind_speed'],
       windDegrees = map['daily'][_index]['wind_deg'],
-      windGust = map['daily'][_index].containsKey('wind_gust')
-        ? map['daily'][_index]['wind_gust']
-        : null,
       snow = map['daily'][_index].containsKey('snow')
         ? map['daily'][_index]['snow']
         : null,

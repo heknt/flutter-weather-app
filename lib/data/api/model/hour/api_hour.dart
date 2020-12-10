@@ -13,7 +13,6 @@ class ApiHour {
   final num clouds; // Cloudiness, %
   final num windSpeed; // [metre/sec]
   final num windDegrees;
-  final num windGust;
   final num snow;
   final num rain;
 
@@ -32,14 +31,11 @@ class ApiHour {
       clouds = map['hourly'][_index]['clouds'],
       windSpeed = map['hourly'][_index]['wind_speed'],
       windDegrees = map['hourly'][_index]['wind_deg'],
-      windGust = map['hourly'][_index].containsKey('wind_gust')
-        ? map['hourly'][_index]['wind_gust']
-        : null,
       snow = map['hourly'][_index].containsKey('snow')
-        ? map['hourly'][_index]['snow']
+        ? map['hourly'][_index]['snow']['1h']
         : null,
       rain = map['hourly'][_index].containsKey('rain')
-        ? map['hourly'][_index]['rain']
+        ? map['hourly'][_index]['rain']['1h']
         : null;
 
   // _getValueByKey(Map<String, dynamic> map, int _index, String key) {

@@ -236,26 +236,18 @@ Map<String, dynamic> dayFieldsInfo = {
     'en': 'Wind Degrees',
     'ru': 'Ветер под углом',
   },
-  'wind_gust': {
-    'unit': {
-      'en': 'metre/sec',
-      'ru': 'м/с',
-    },
-    'en': 'Wind Gust',
-    'ru': 'Порыв ветра',
-  },
   'snow': {
     'unit': {
-      'en': '%',
-      'ru': '%',
+      'en': 'mm',
+      'ru': 'мм',
     },
     'en': 'Snow',
     'ru': 'Снег',
   },
   'rain': {
     'unit': {
-      'en': '%',
-      'ru': '%',
+      'en': 'mm',
+      'ru': 'мм',
     },
     'en': 'Rain',
     'ru': 'Дождь',
@@ -355,26 +347,18 @@ Map<String, dynamic> hourFieldsInfo = {
     'en': 'Wind Degrees',
     'ru': 'Ветер под углом',
   },
-  'wind_gust': {
-    'unit': {
-      'en': 'metre/sec',
-      'ru': 'м/с',
-    },
-    'en': 'Wind Gust',
-    'ru': 'Порыв ветра',
-  },
   'snow': {
     'unit': {
-      'en': '%',
-      'ru': '%',
+      'en': 'mm',
+      'ru': 'мм',
     },
     'en': 'Snow',
     'ru': 'Снег',
   },
   'rain': {
     'unit': {
-      'en': '%',
-      'ru': '%',
+      'en': 'mm',
+      'ru': 'мм',
     },
     'en': 'Rain',
     'ru': 'Дождь',

@@ -32,13 +32,8 @@ class DayMapper {
       clouds: day.clouds.toInt(),
       windSpeed: day.windSpeed,
       windDegrees: day.windDegrees.toInt(),
-      windGust: day.windGust,
-      snow: day.snow != null
-        ? day.snow*100
-        : null,
-      rain: day.rain != null
-        ? day.rain*100
-        : null,
+      snow: day.snow,
+      rain: day.rain,
     );
   }
 
@@ -65,7 +60,6 @@ class DayMapper {
       'clouds': day.clouds,
       'windSpeed': day.windSpeed,
       'windDegrees': day.windDegrees,
-      'windGust': day.windGust,
       'snow': day.snow,
       'rain': day.rain,
     };
@@ -97,7 +91,6 @@ class DayMapper {
       clouds: jsonData['clouds'],
       windSpeed: jsonData['windSpeed'],
       windDegrees: jsonData['windDegrees'],
-      windGust: jsonData['windGust'],
       snow: jsonData['snow'],
       rain: jsonData['rain'],
     );

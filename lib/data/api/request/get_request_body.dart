@@ -17,7 +17,7 @@ class GetRequestBody {
     return {
       'appid': openWeatherMapAppId,
       'units': 'metric',
-      'exclude': 'minutelly,hourly',
+      'exclude': 'minutely,hourly',
       'lat': latitude,
       'lon': longitude,
       'lang': language,
@@ -28,7 +28,7 @@ class GetRequestBody {
     return {
       'appid': openWeatherMapAppId,
       'units': 'metric',
-      'exclude': 'minutelly,daily',
+      'exclude': 'minutely,daily',
       'lat': latitude,
       'lon': longitude,
       'lang': language,

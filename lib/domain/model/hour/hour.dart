@@ -14,7 +14,6 @@ class Hour {
   final int clouds;
   final num windSpeed;
   final int windDegrees;
-  final num windGust;
   final num snow;
   final num rain;
 
@@ -31,7 +30,6 @@ class Hour {
   	@required this.clouds,
   	@required this.windSpeed,
   	@required this.windDegrees,
-  	this.windGust,
   	this.snow,
   	this.rain,
   });
