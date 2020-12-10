@@ -10,9 +10,11 @@ Main features:
 ## Structure
 Project divided by four structure levels (data, domain (business-logic), internal, presentation).
 
-Presentation contains two screens:
+Presentation contains four screens:
 - splash - with weather-logo (shown for several sec on app start, and you can tap on image to speed up the transition).
-- home - main screen. Here is the main features, and two buttons (daily, hourly) which can open API by tap.
+- home - main screen. Here is the main features, and two buttons (daily, hourly) which can open API by tap. There is showing weather information shortly.
+- detailed day screen - screen with detailed day information.
+- detailed hour - screen with detailed hour information.
 
 
 ## API
