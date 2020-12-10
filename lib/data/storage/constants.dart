@@ -23,6 +23,10 @@ Map<String, dynamic> localePhrases = {
 
     },
   'data': {
+    'press_detailed': {
+      'en': 'Press on a box to detailed info.',
+      'ru': 'Нажмите на контейнер для детальной информации.'
+    },
     'do_not_exist_lable': {
       'en': 'not this time',
       'ru': 'не в это время'
@@ -105,7 +109,6 @@ Map<String, dynamic> dayFieldsInfo = {
     'en': 'Description',
     'ru': 'Описание',
   },
-  /// not working. can not find _getIconUrl method in OpenWeatherMapService
   // 'weather_icon_code': ((String iconCode) =>
   //     OpenWeatherMapService._getIconUrl(iconCode)).toString(),
   'day_temp': {
@@ -280,7 +283,6 @@ Map<String, dynamic> hourFieldsInfo = {
     'en': 'Description',
     'ru': 'Описание',
   },
-  /// not working. can not find _getIconUrl method in OpenWeatherMapService
   // 'weather_icon_code': ((String iconCode) =>
   //     OpenWeatherMapService._getIconUrl(iconCode)).toString(),
   'temperature': {
@@ -366,6 +368,51 @@ Map<String, dynamic> hourFieldsInfo = {
 };
 
 
+List<String> flatDayFields = [
+  'time',
+  'sunrise',
+  'sunset',
+  'weather_main',
+  'weather_desc',
+  // 'weather_icon_code',
+  'day_temp',
+  'min_temp',
+  'max_temp',
+  'night_temp',
+  'eve_temp',
+  'morn_temp',
+  'day_temp_feels_like',
+  'night_temp_feels_like',
+  'eve_temp_feels_like',
+  'morn_temp_feels_like',
+  'pressure',
+  'humidity',
+  'atmospheric_temp',
+  'clouds',
+  'wind_speed',
+  'wind_degrees',
+  'snow',
+  'rain',
+];
+
+List<String> flatHourFields = [
+  'time',
+  'weather_main',
+  'weather_desc',
+  // 'weather_icon_code',
+  'temperature',
+  'temp_feels_like',
+  'pressure',
+  'humidity',
+  'atmospheric_temp',
+  'clouds',
+  'wind_speed',
+  'wind_degrees',
+  'snow',
+  'rain',
+];
+
+
 enum dayFields {
   time,
   sunrise,
@@ -389,7 +436,6 @@ enum dayFields {
   clouds,
   windSpeed,
   windDegrees,
-  windGust,
   snow,
   rain,
 }
@@ -407,7 +453,6 @@ enum hourFields {
   clouds,
   windSpeed,
   windDegrees,
-  windGust,
   snow,
   rain,
 }

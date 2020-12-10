@@ -17,9 +17,10 @@ class OpenWeatherMapService {
   // String _getValidApiUrl() =>
   //   '$_apiBaseUrl/data/2.5/onecall?appid=$openWeatherMapAppId';
   
-  String _getIconUrl(String iconCode) => 
-    'http://openweathermap.org/img/wn/$iconCode@2x.png';
- 
+  static String getIconUrl(String iconCode) { 
+    return 'http://openweathermap.org/img/wn/$iconCode@2x.png';
+  }
+
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl: _apiBaseUrl,

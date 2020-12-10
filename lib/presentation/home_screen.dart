@@ -11,7 +11,14 @@ import 'package:weather_app/domain/model/day/day.dart';
 import 'package:weather_app/domain/model/hour/hour.dart';
 import 'package:weather_app/domain/bloc/home_bloc.dart';
 import 'package:weather_app/data/storage/constants.dart';
-// import 'package:weather_app/data/api/services/openweathermap_service.dart';
+
+import 'helpers/day_helper.dart';
+import 'helpers/hour_helper.dart';
+import 'helpers/list_helper.dart';
+import 'day_screen.dart';
+import 'day_screen.dart';
+import 'hour_screen.dart';
+
 
 bool isTablet() {
   Size size = window.physicalSize;
@@ -36,6 +43,7 @@ class HomeScreenState extends State<HomeScreen> {
   String _language;
   String _dayTimeFormatOfLang;
   String _dateFormatOfLang;
+  String _hintDetailed;
   Geolocator geolocator;
   Position _currentPosition;
   String _currentAddress;
@@ -76,7 +84,6 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // homeBloc = Provider.of<HomeBloc>(context);
     return Consumer<HomeBloc>(
       builder: (context, _homeBloc, child) {
         homeBloc = _homeBloc;
@@ -116,6 +123,7 @@ class HomeScreenState extends State<HomeScreen> {
                           localePhrases['time']['date_format'][_language];
                       _dayTimeFormatOfLang =
                           localePhrases['time']['day_time_format'][_language];
+                      _hintDetailed = localePhrases['data']['press_detailed'][_language];
                       print('hass Language $_language');
                     } else { print('hass NOT Language Dataa'); }
                     
@@ -211,6 +219,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   Widget _contentColumn() {
     return SingleChildScrollView(
+      physics: ScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
@@ -256,7 +265,7 @@ class HomeScreenState extends State<HomeScreen> {
   Widget _showDaily(List<Day> dayList) {
     return dayList != null
       ? Column(
-          children: _getDayWidgetList(dayList),
+          children: _getDayPartWidgetList(dayList),
         )
       : Text(localePhrases['data']['press_one_more']['daily'][_language]);
   }
@@ -270,159 +279,124 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
 
-  List<Widget> _getDayWidgetList(List<Day> dayList) {
-    List<Widget> _dayWidgetList = [];
+  List<Widget> _getDayPartWidgetList(List<Day> dayList) {
+    List<Widget> _dayWidgetList = [_getHintDetailed()];
 
     for (final day in dayList) {
       _dayWidgetList.add(
-        _getIconFromNetwork(day.weatherIconCode)
+        ListHelper.getIconFromNetwork(day.weatherIconCode)
       );
       String timeFormat = DateFormat(_dateFormatOfLang).format(day.time);
       _dayWidgetList.add(
-        Text('${dayFieldsInfo["time"][_language]} $timeFormat',
-          style: _titleStyle(),
+        Text(
+          '${dayFieldsInfo["time"][_language]} $timeFormat',
+          style: ListHelper.titleStyle(),
         )
       );
-      _dayWidgetList.add(_getDayWidget(day));
+      _dayWidgetList.add(_getDayPartWidget(day));
     }
     return _dayWidgetList;
   }
 
-  // TimeOfDay for hours
+
   List<Widget> _getHourWidgetList(List<Hour> hourList) {
-    List<Widget> _hourWidgetList = [];
-    // final OpenWeatherMapService _service = OpenWeatherMapService();
+    List<Widget> _hourWidgetList = [_getHintDetailed()];
 
     for (final hour in hourList) {
       _hourWidgetList.add(
-        _getIconFromNetwork(
-          // _service,
-          hour.weatherIconCode)
+        ListHelper.getIconFromNetwork(hour.weatherIconCode)
       );
       String timeFormat =
           DateFormat("$_dayTimeFormatOfLang, $_dateFormatOfLang").format(hour.time);
       _hourWidgetList.add(
         Text('${hourFieldsInfo["time"][_language]} $timeFormat',
-          style: _titleStyle(),
+          style: ListHelper.titleStyle(),
         )
       );
-      _hourWidgetList.add(_getHourWidget(hour));
+      _hourWidgetList.add(_getHourPartWidget(hour));
     }
     return _hourWidgetList;
   }
 
-  TextStyle _titleStyle() {
-    return TextStyle(
-      height: 3,
-      fontSize: 16,
-      fontStyle: FontStyle.italic,
-    );
-  }
-
-  Widget _getIconFromNetwork(
-    // OpenWeatherMapService _service,
-    String iconCode
-  ){
-    return Image.network(
-      /// _service doesn't want to define methods
-      /// i.e. '_getIconUrl()', '_apiBaseUrl'...
-      // _service._getIconUrl(iconCode)
-
-      /// so local full-defined url for this
-      'http://openweathermap.org/img/wn/$iconCode@2x.png'
-    );
-  }
-
-  Widget _getDayWidget(Day day) {
+  Widget _getDayPartWidget(Day day) {
+    List<String> _dayPartList = ['weather_desc', 'day_temp'];
+   
     return Container(
       padding: const EdgeInsets.all(10.0),
-      decoration: _boxDecorWidget(),
-      child: Column(
-        children: <Widget>[
-          _getFieldDataRow(dayFieldsInfo['sunrise'], _toTimeOfDayStr(day.sunrise)),
-          _getFieldDataRow(dayFieldsInfo['sunset'], _toTimeOfDayStr(day.sunset)),
-          _getFieldDataRow(dayFieldsInfo['weather_main'], day.weatherMain),
-          _getFieldDataRow(dayFieldsInfo['weather_desc'], day.weatherDesc),
-          _getFieldDataRow(dayFieldsInfo['day_temp'], day.dayTemp),
-          _getFieldDataRow(dayFieldsInfo['min_temp'], day.minTemp),
-          _getFieldDataRow(dayFieldsInfo['max_temp'], day.maxTemp),
-          _getFieldDataRow(dayFieldsInfo['night_temp'], day.nightTemp),
-          _getFieldDataRow(dayFieldsInfo['eve_temp'], day.eveTemp),
-          _getFieldDataRow(dayFieldsInfo['morn_temp'], day.mornTemp),
-          _getFieldDataRow(dayFieldsInfo['day_temp_feels_like'], day.dayTempFeelsLike),
-          _getFieldDataRow(dayFieldsInfo['night_temp_feels_like'], day.nightTempFeelsLike),
-          _getFieldDataRow(dayFieldsInfo['eve_temp_feels_like'], day.eveTempFeelsLike),
-          _getFieldDataRow(dayFieldsInfo['morn_temp_feels_like'], day.mornTempFeelsLike),
-          _getFieldDataRow(dayFieldsInfo['pressure'], day.pressure),
-          _getFieldDataRow(dayFieldsInfo['humidity'], day.humidity),
-          _getFieldDataRow(dayFieldsInfo['atmospheric_temp'], day.atmosphericTemp),
-          _getFieldDataRow(dayFieldsInfo['clouds'], day.clouds),
-          _getFieldDataRow(dayFieldsInfo['wind_speed'], day.windSpeed),
-          _getFieldDataRow(dayFieldsInfo['wind_degrees'], day.windDegrees),
-          _getFieldDataRow(dayFieldsInfo['snow'], day.snow),
-          _getFieldDataRow(dayFieldsInfo['rain'], day.rain),
-        ],
-      ),
-    );
-  }
-
-  String _toTimeOfDayStr(DateTime rawTime) {
-    return DateFormat(_dayTimeFormatOfLang).format(rawTime);
-  }
-
-  Widget _getHourWidget(Hour hour) {
-    return Container(
-      padding: const EdgeInsets.all(10.0),
-      decoration: _boxDecorWidget(),
-      child: Column(
-        children: <Widget>[
-          _getFieldDataRow(hourFieldsInfo['weather_main'], hour.weatherMain),
-          _getFieldDataRow(hourFieldsInfo['weather_desc'], hour.weatherDesc),
-          _getFieldDataRow(hourFieldsInfo['temperature'], hour.temperature),
-          _getFieldDataRow(hourFieldsInfo['temp_feels_like'], hour.tempFeelsLike),
-          _getFieldDataRow(hourFieldsInfo['pressure'], hour.pressure),
-          _getFieldDataRow(hourFieldsInfo['humidity'], hour.humidity),
-          _getFieldDataRow(hourFieldsInfo['atmospheric_temp'], hour.atmosphericTemp),
-          _getFieldDataRow(hourFieldsInfo['clouds'], hour.clouds),
-          _getFieldDataRow(hourFieldsInfo['wind_speed'], hour.windSpeed),
-          _getFieldDataRow(hourFieldsInfo['wind_degrees'], hour.windDegrees),
-          _getFieldDataRow(hourFieldsInfo['snow'], hour.snow),
-          _getFieldDataRow(hourFieldsInfo['rain'], hour.rain),
-        ],
-      ),
-    );
-  }
-
-  BoxDecoration _boxDecorWidget() {
-    return BoxDecoration(
-      border: Border.all(
-        color: Colors.brown[500],
-      ),
-      borderRadius: BorderRadius.all(Radius.circular(8))
-    );
-  }
-
-  Widget _getFieldDataRow(Map<String, dynamic> fieldMap, var fieldValue) {
-    final doNotExistLable = localePhrases['data']['do_not_exist_lable'][_language];
-    TextStyle _fieldStyle = TextStyle(
-        fontSize: 15,
-      );
-    return Row(
-      children: <Widget>[
-        Text('${fieldMap[_language]}: ',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-          ),
-        ),
-        fieldValue != null
-          ? Text('$fieldValue ${fieldMap["unit"][_language]}',
-              style: _fieldStyle,
-            )
-          : Text(doNotExistLable,
-              style: _fieldStyle,
+      decoration: ListHelper.boxDecorList(),
+      child: ListView.builder(
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: _dayPartList.length,
+        itemBuilder: (context, index) {
+          String _title = _dayPartList[index];
+          return ListTile(
+            title: Text(dayFieldsInfo[_title][_language]),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DayScreen(
+                      day: day,
+                      language: _language,
+                      dayTimeFormatOfLang: _dayTimeFormatOfLang,
+                      dateFormatOfLang: _dateFormatOfLang,
+                    ),
+                ),
+              );
+            },
+            trailing: DayHelper.getDayFieldValueBoxByTitle(
+                day, _title, _dayTimeFormatOfLang, _language
             ),
-      ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _getHourPartWidget(Hour hour) {
+    List<String> _hourPartList = ['weather_desc', 'temperature'];
+   
+    return Container(
+      padding: const EdgeInsets.all(10.0),
+      decoration: ListHelper.boxDecorList(),
+      child: ListView.builder(
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: _hourPartList.length,
+        itemBuilder: (context, index) {
+          String _title = _hourPartList[index];
+          return ListTile(
+            title: Text(hourFieldsInfo[_title][_language]),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HourScreen(
+                      hour: hour,
+                      language: _language,
+                      dayTimeFormatOfLang: _dayTimeFormatOfLang,
+                      dateFormatOfLang: _dateFormatOfLang,
+                    ),
+                ),
+              );
+            },
+            trailing: HourHelper.getHourFieldValueBoxByTitle(
+                hour, _title, _dayTimeFormatOfLang, _language
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _getHintDetailed() {
+    return Text(
+      _hintDetailed,
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        // fontSize: 15,
+      ),
     );
   }
 
